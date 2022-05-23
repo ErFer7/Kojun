@@ -27,8 +27,8 @@ main = do
 
     let inputInt = inputStrToInt testStr
     let size = getSize inputInt
-    let regions = getRegionArray inputInt
-    let values = getValueArray inputInt
+    let regions = getRegionList inputInt
+    let values = getValueList inputInt
     let puzzle = buildPuzzle size regions values
     let sizeStr = getSizeStr puzzle
 
