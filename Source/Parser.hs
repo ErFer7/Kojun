@@ -5,13 +5,13 @@ module Parser (inputStrToInt, getSize, getRegionArray, getValueArray) where
 
 -- Auxiliares
 selectN :: Int -> [t] -> [t]
-selectN x (a:b)
-    | (x >= 0)  = [a] ++ selectN (x - 1) b
+selectN n (a:b)
+    | (n >= 0)  = [a] ++ selectN (n - 1) b
     | otherwise = []
 
 deleteN :: Int -> [t] -> [t]
-deleteN x (a:b)
-    | (x <= length (a:b)) = deleteN x b
+deleteN n (a:b)
+    | (n <= length (a:b)) = deleteN n b
     | otherwise          = (a:b)
 
 -- Tratamento de dados

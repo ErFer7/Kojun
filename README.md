@@ -21,3 +21,9 @@ Trabalho 1 de Paradigmas de Programação
 ## v0.2
 
 * Parser implementado.
+
+---
+
+## v0.3
+
+* Printer implementado.

@@ -17,4 +17,4 @@ buildPuzzle :: Int -> [Int] -> [Int] -> Puzzle
 buildPuzzle size regions values = (size, buildCellArray regions values)
 
 getCell :: Int -> Int -> Puzzle -> Cell
-getCell i j (size, cells) = cells!!(i * size + j)
+getCell x y (size, cells) = cells!!(y * size + x)
