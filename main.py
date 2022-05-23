@@ -69,5 +69,5 @@ Repetir passos 1 - 3 ate nao houver mudanca
 
 '''
 
-teste = montar_tabuleiro('Puzzles/tabuleiro_teste.txt')
+teste = montar_tabuleiro('Puzzles/Kojun_12.txt')
 print(teste)

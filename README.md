@@ -15,3 +15,9 @@ Trabalho 1 de Paradigmas de Programação
 ## 0.1.1
 
 * Arquivos organizados.
+
+---
+
+## v0.2
+
+* Parser implementado.
