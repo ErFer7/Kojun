@@ -1,6 +1,6 @@
 -- Trabalho 1 de Paradigmas de Programação
 -- Grupo: Eric e Otávio
--- v0.1
+-- v0.1.1
 
 -- Funcionamento:
 -- Leitura e montagem do tabuleiro
