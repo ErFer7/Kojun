@@ -14,7 +14,7 @@ selectN n (a:b)
 deleteN :: Int -> [t] -> [t]
 deleteN n (a:b)
     | (n <= length (a:b)) = deleteN n b
-    | otherwise          = (a:b)
+    | otherwise           = (a:b)
 
 -- Tratamento de dados --------------------------------------------------------
 -- Mapeia os dados de entrada para uma lista de inteiros
@@ -27,8 +27,8 @@ getSize inputInt = inputInt!!0
 
 -- Obtém uma lista com as regiões
 getRegionList :: [Int] -> [Int]
-getRegionList inputInt = tail (selectN ((getSize inputInt) ^ 2) inputInt)
+getRegionList inputInt = tail (selectN ((getSize inputInt)^2) inputInt)
 
 -- Obtém uma lista com os valores
 getValueList :: [Int] -> [Int]
-getValueList inputInt = deleteN ((getSize inputInt) ^ 2 + 1) inputInt
+getValueList inputInt = deleteN ((getSize inputInt)^2 + 1) inputInt
