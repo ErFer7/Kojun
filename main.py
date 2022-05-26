@@ -28,44 +28,74 @@ def criar_tabuleiro(dados):
     'coloca [valor_inicial, regiao, imutavel] na matriz'
     tabuleiro['celulas']=[
             [
-                dados['iniciais'][i],       # valor inicial
-                dados['regioes'][i],        # regiao a qual pertence
-                (dados['iniciais'][i] != 0) # se for imutavel
+                dados['regioes'][i],       # valor inicial
+                dados['iniciais'][i]        # regiao a qual pertence
             ] for i in range(t**2)
         ]
 
     'coloca coordenadas da celula na regiao correspondente'
     tabuleiro['regioes'] = {}
     for i in range(t**2):
-            if tabuleiro['celulas'][i][1] in tabuleiro['regioes']:
-                tabuleiro['regioes'][tabuleiro['celulas'][i][1]].append(i)
-            else:
-                tabuleiro['regioes'][tabuleiro['celulas'][i][1]] = [i]
-    
-    'marca valores possiveis [1..N] para regiao de tamanho N'
-    for i in tabuleiro['regioes']:
-        tamanho = len(tabuleiro['regioes'][i])
-        for j in tabuleiro['regioes'][i]:
-            if tabuleiro['celulas'][j][2] == 0: 
-                tabuleiro['celulas'][j][0] = [i+1 for i in range(tamanho)]
-    
+        if tabuleiro['celulas'][i][0] in tabuleiro['regioes']:
+            tabuleiro['regioes'][tabuleiro['celulas'][i][0]].append(i)
+        else:
+            tabuleiro['regioes'][tabuleiro['celulas'][i][0]] = [i]
     return tabuleiro
 
 def montar_tabuleiro(nome_arquivo):
     tab = abrir_arquivo(nome_arquivo)
     tab = criar_tabuleiro(tab)
     return tab
-    
+
 def print_tabuleiro(tabuleiro):
     tamanho = tabuleiro['tamanho']
     print("Celulas:")
     for i in range(tamanho):
-        print("\nLinha %d:\n" % (i))
         for j in range(tamanho):
-            print(tabuleiro['celulas'][i*tamanho+j])
+            print(tabuleiro['celulas'][i*tamanho+j],end=' ')
+        print()
     print("\nRegioes:\n")
     for i in tabuleiro['regioes']:
-        print(tabuleiro['regioes'][i])
+        print('Regiao',i,'=',tabuleiro['regioes'][i])
+
+def valores_possiveis(tabuleiro):
+    t = tabuleiro['tamanho']
+    valores = [[] for i in range(tabuleiro['tamanho']**2)]
+
+    #cada indice recebe lista de valores 1..N para celula em regiao tamanho n
+    for i in tabuleiro['regioes']:
+        tamanho = len(tabuleiro['regioes'])
+        presentes = []
+        for j in tabuleiro['regioes'][i]:
+            valor = tabuleiro['celulas'][j][1]
+            if valor == 0:
+                valores[i] = [k for k in range(1,tamanho+1)]
+            else:
+                presentes.append(valor)
+
+        print('presentes=',presentes)
+        #depois, valores ja definidos em uma regiao sao eliminados
+        for j in tabuleiro['regioes'][i]:
+            [valores[tabuleiro['celulas'][tabuleiro['regioes'][i]]].remove(
+                elem
+            ) for elem in presentes]
+
+    #entao, valores adjacentes sao eliminados
+    for i in range(tabuleiro['tamanho']**2):
+        if i // t != 0 and tabuleiro['celulas'][i-t][1] in valores[i]: #acima
+            valores[i].remove(tabuleiro['celulas'][i-t][1])
+        if i // t != t-1 and tabuleiro['celulas'][i+t][1] in valores[i]: #abaixo
+            valores[i].remove(tabuleiro['celulas'][i+t][1])
+        if i % t != 0 and tabuleiro['celulas'][i-1][1] in valores[i]: #esquerda
+            valores[i].remove(tabuleiro['celulas'][i-1][1])
+        if i % t != t-1 and tabuleiro['celulas'][i+1][1] in valores[i]: #direita
+            valores[i].remove(tabuleiro['celulas'][i+1][1])
+
+    return valores
+
+
+
+
 
 '''
 algoritmo resolucao
@@ -111,3 +141,5 @@ def backtracking(tabuleiro):
 
 teste = montar_tabuleiro('Puzzles/Kojun_12.txt')
 print_tabuleiro(teste)
+for i in valores_possiveis(teste):
+    print(i)

@@ -13,9 +13,9 @@ module Structure (Cell,
                   getValuesInRegion) where
 
 -- Tipos ----------------------------------------------------------------------
-type Cell = (Int, Int)
-type Puzzle = (Int, [Cell])
-type Region = [Int]
+type Cell = (Int, Int)      -- celula = (regiao,valor)
+type Puzzle = (Int, [Cell]) -- tabuleiro = (tamanho,[celulas])
+type Region = [Int]         -- regiao = [coords]
 
 -- Auxiliares -----------------------------------------------------------------
 -- Constrói uma lista de células

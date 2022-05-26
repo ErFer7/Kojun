@@ -19,6 +19,7 @@ import Structure
 import Parser
 import Solver
 import Printer
+import Solver
 
 main = do
 
@@ -32,7 +33,11 @@ main = do
     let values = getValueList inputInt
     let puzzle = buildPuzzle size regions values
     let sizeStr = getSizeStr puzzle
+<<<<<<< HEAD
     let regions = getRegions puzzle
+=======
+    --let possible = getPossibleValues puzzle
+>>>>>>> a114fb8e3dce0da0cecbf8abe1a40d1bfbd15c40
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
     putStr (buildPuzzleStr puzzle)
