@@ -27,3 +27,9 @@ Trabalho 1 de Paradigmas de Programação
 ## v0.3
 
 * Printer implementado.
+
+---
+
+## v0.3.1
+
+* Solução em python aprimorada e função para a construção de regiões implementada.

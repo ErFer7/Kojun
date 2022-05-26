@@ -1,16 +1,12 @@
 # Define o comando de remoção com base no sistema operacional
 ifeq ($(OS),Windows_NT)
-	RM = del /f
+	CLEAN = del *.hi *.o del /f /s
 else
-	RM = rm -f
+	CLEAN = rm -rf *.hi *.o
 endif
 
 Kojun: KojunSolver.hs Source/Structure.hs Source/Parser.hs Source/Printer.hs Source/Solver.hs
 	ghc KojunSolver.hs Source/Structure.hs Source/Parser.hs Source/Printer.hs Source/Solver.hs
 
 clean:
-	$(RM) *.exe
-	$(RM) *.hi
-	$(RM) *.o
-	$(RM) Source/*.hi
-	$(RM) Source/*.o
+	$(CLEAN)
