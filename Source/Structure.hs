@@ -1,7 +1,16 @@
 -- Structure
 -- Define a estrutura.
 
-module Structure (Cell, Puzzle, buildPuzzle, getCell2D, getCell, getCellRegion, getCellValue, getRegions) where
+module Structure (Cell,
+                  Puzzle,
+                  buildPuzzle,
+                  getCell2D,
+                  getCell,
+                  getCellRegion,
+                  getCellValue,
+                  getRegions,
+                  getRegionIndexes,
+                  getValuesInRegion) where
 
 -- Tipos ----------------------------------------------------------------------
 type Cell = (Int, Int)
@@ -32,12 +41,12 @@ contains v (a:b)
     | v == a = True
     | otherwise = contains v b
 
--- Obtém os índices de cada região a ser procurada posteriormente
-getRegionIndexes :: [Int] -> [Cell] -> [Int]
-getRegionIndexes _ [] = []
-getRegionIndexes regionIndexes (a:b)
-    | contains (getCellRegion a) regionIndexes = getRegionIndexes regionIndexes b
-    | otherwise = [getCellRegion a] ++ getRegionIndexes (regionIndexes ++ [getCellRegion a]) b
+-- Função auxiliar para a obtenção dos índices das regiões
+getRegionIndexesAux :: [Int] -> [Cell] -> [Int]
+getRegionIndexesAux _ [] = []
+getRegionIndexesAux regionIndexes (a:b)
+    | contains (getCellRegion a) regionIndexes = getRegionIndexesAux regionIndexes b
+    | otherwise = [getCellRegion a] ++ getRegionIndexesAux (regionIndexes ++ [getCellRegion a]) b
 
 -- Função auxiliar para a obtenção de regiões
 getRegionsAux :: [Int] -> Puzzle -> [Region]
@@ -67,4 +76,13 @@ getCellValue (_, value) = value
 
 -- Obtém uma lista de regiões
 getRegions :: Puzzle -> [Region]
-getRegions (size, cells) = getRegionsAux (getRegionIndexes [] cells) (size, cells)
+getRegions puzzle = getRegionsAux (getRegionIndexes puzzle) puzzle
+
+-- Obtém os índices de cada região a ser procurada posteriormente
+getRegionIndexes :: Puzzle -> [Int]
+getRegionIndexes (_, cells) = getRegionIndexesAux [] cells
+
+-- Obtém os valores em uma região
+getValuesInRegion :: Region -> Puzzle -> [Int]
+getValuesInRegion [] _ = []
+getValuesInRegion (a:b) puzzle = [getCellValue (getCell a puzzle)] ++ getValuesInRegion b puzzle

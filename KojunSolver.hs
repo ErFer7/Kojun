@@ -1,6 +1,6 @@
 -- Trabalho 1 de Paradigmas de Programação
 -- Grupo: Eric e Otávio
--- v0.3.1
+-- v0.3.2
 
 -- Funcionamento:
 -- Leitura e montagem do tabuleiro
@@ -17,6 +17,7 @@
 
 import Structure
 import Parser
+import Solver
 import Printer
 
 main = do
@@ -31,7 +32,9 @@ main = do
     let values = getValueList inputInt
     let puzzle = buildPuzzle size regions values
     let sizeStr = getSizeStr puzzle
+    let regions = getRegions puzzle
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
     putStr (buildPuzzleStr puzzle)
-    print (show (getRegions puzzle))
+    print (show (regions!!0))
+    print (show (getValuesInRegion (regions!!0) puzzle))
