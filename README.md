@@ -33,3 +33,7 @@ Trabalho 1 de Paradigmas de Programação
 ## v0.3.1
 
 * Solução em python aprimorada e função para a construção de regiões implementada.
+
+## v0.3.2
+
+* Funções de construção de regiões implementadas
