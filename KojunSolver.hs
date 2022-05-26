@@ -34,3 +34,4 @@ main = do
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
     putStr (buildPuzzleStr puzzle)
+    print (show (getRegions puzzle))
