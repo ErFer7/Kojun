@@ -8,6 +8,7 @@ module Structure (Cell,
                   getCell,
                   getCellRegion,
                   getCellValue,
+                  getRegion,
                   getRegions,
                   getRegionIndexes,
                   getValuesInRegion) where
@@ -23,17 +24,6 @@ buildCellList :: [Int] -> [Int] -> [Cell]
 buildCellList [] [] = []
 buildCellList (a:b) (c:d) = [(a, c)] ++ buildCellList b d
 
--- Constrói uma região
-buildRegion :: Int -> Int -> Puzzle -> Region
-buildRegion r i (size, cells) =
-    if i < size^2 then
-        if getCellRegion (getCell i (size, cells)) == r then
-            [i] ++ buildRegion r (i + 1) (size, cells)
-        else
-            buildRegion r (i + 1) (size, cells)
-    else
-        []
-
 -- Checa se um valor está na lista
 contains :: Int -> [Int] -> Bool
 contains _ [] = False
@@ -48,10 +38,21 @@ getRegionIndexesAux regionIndexes (a:b)
     | contains (getCellRegion a) regionIndexes = getRegionIndexesAux regionIndexes b
     | otherwise = [getCellRegion a] ++ getRegionIndexesAux (regionIndexes ++ [getCellRegion a]) b
 
+-- Função auxiliar para a obtenção de uma região
+getRegionAux :: Int -> Int -> Puzzle -> Region
+getRegionAux r i (size, cells) =
+    if i < size^2 then
+        if getCellRegion (getCell i (size, cells)) == r then
+            [i] ++ getRegionAux r (i + 1) (size, cells)
+        else
+            getRegionAux r (i + 1) (size, cells)
+    else
+        []
+
 -- Função auxiliar para a obtenção de regiões
 getRegionsAux :: [Int] -> Puzzle -> [Region]
 getRegionsAux [] _ = []
-getRegionsAux (a:b) puzzle = [buildRegion a 0 puzzle] ++ getRegionsAux b puzzle
+getRegionsAux (a:b) puzzle = [getRegionAux a 0 puzzle] ++ getRegionsAux b puzzle
 
 -- Construção e acesso --------------------------------------------------------
 -- Constrói o puzzle com base no tipo
@@ -73,6 +74,10 @@ getCellRegion (region, _) = region
 -- Obtém o valor da célula
 getCellValue :: Cell -> Int
 getCellValue (_, value) = value
+
+-- Obtém uma região
+getRegion :: Int -> Puzzle -> Region
+getRegion r puzzle = getRegionAux r 0 puzzle
 
 -- Obtém uma lista de regiões
 getRegions :: Puzzle -> [Region]

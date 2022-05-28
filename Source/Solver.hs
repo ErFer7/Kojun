@@ -19,17 +19,49 @@ module Solver where
 import Structure
 
 -- Auxiliares ------------------------------------------------------------------
--- count :: Int -> [Int] -> Int
--- count [] v = 0
--- count (a:b) v
---     | a == v = 1 + count b v
---     | otherwise = count b v
+-- Conta quantas vezes um valor aparece na lista
+count :: Int -> [Int] -> Int
+count v [] = 0
+count v (a:b)
+    | a == v = 1 + count v b
+    | otherwise = count v b
 
--- checkRegionValues :: [Int] -> Bool
--- checkRegionValues [] = True
--- checkRegionValues (a:b)
---     | count ((length (a:b)) (a:b)) == 1 = checkRegion b
---     | otherwise = False
+-- Checa se um valor não se repete na região
+checkRegionRepetition :: [Int] -> Bool
+checkRegionRepetition [] = True
+checkRegionRepetition (a:b)
+    | count (length (a:b)) (a:b) <= 1 = checkRegionRepetition b
+    | otherwise = False
+
+-- Checa se todas as células adjacentes são diferentes
+checkOrthogonalDifference :: Int -> Int -> Puzzle -> Bool
+checkOrthogonalDifference x y puzzle
+    | getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y + 1) puzzle) &&
+      getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y - 1) puzzle) &&
+      getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x + 1) y puzzle) &&
+      getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x - 1) y puzzle) = True
+    | otherwise = False
+
+-- Checa se a célula superior é maior que a atual
+checkVerticalGreatness :: Int -> Int -> Puzzle -> Bool
+checkVerticalGreatness x y puzzle
+    | getCellValue (getCell2D x y puzzle) < getCellValue (getCell2D x (y + 1) puzzle) ||
+      getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y + 1) puzzle) = True
+    | otherwise = False
+
+-- Checa todas as regras para uma célula
+checkCell :: Int -> Int -> Puzzle -> Bool
+checkCell x y puzzle
+    | checkRegionRepetition (getValuesInRegion (getRegion (getCellRegion (getCell2D x y puzzle)) puzzle) puzzle) &&
+      checkOrthogonalDifference x y puzzle &&
+      checkVerticalGreatness x y puzzle = True
+    | otherwise = False
+
+-- TODO: Função para obter valores possíveis
+-- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
+-- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
+
+--------------------------------------------------------------------------------
 
 {-
 removeElement :: Int -> [Int] -> [Int]

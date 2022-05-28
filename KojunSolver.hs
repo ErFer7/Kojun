@@ -1,19 +1,20 @@
--- Trabalho 1 de Paradigmas de Programação
--- Grupo: Eric e Otávio
--- v0.3.2
+{-  Trabalho 1 de Paradigmas de Programação
+    Grupo: Eric e Otávio
+    v0.3.3
 
--- Funcionamento:
--- Leitura e montagem do tabuleiro
--- Resolução
--- Exibição do resultado
+    Funcionamento:
+    Leitura e montagem do tabuleiro
+    Resolução
+    Exibição do resultado
 
--- TODO:
--- [X] v0.2: Parser e Structure
--- [X] v0.3: Printer
--- [ ] v0.4: Solver                (2022-05-26)
--- [ ] v0.5: Aprimorar o algoritmo (2022-05-27)
--- [ ] v1.0: Arrumar tudo          (2022-05-27)
--- [ ] Relatório                   (2022-05-28)
+    TODO:
+    [X] v0.2: Parser e Structure
+    [X] v0.3: Printer
+    [ ] v0.4: Solver                (2022-05-28)
+    [ ] v0.5: Aprimorar o algoritmo (2022-05-29)
+    [ ] v1.0: Arrumar tudo          (2022-05-29)
+    [ ] Relatório                   (2022-05-30)
+-}
 
 import Structure
 import Parser
