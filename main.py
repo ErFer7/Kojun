@@ -40,6 +40,9 @@ def criar_tabuleiro(dados):
             tabuleiro['regioes'][tabuleiro['celulas'][i][0]].append(i)
         else:
             tabuleiro['regioes'][tabuleiro['celulas'][i][0]] = [i]
+
+    'calcula valores possiveis para cada celula no comeco'
+    valores_possiveis(tabuleiro)
     return tabuleiro
 
 def montar_tabuleiro(nome_arquivo):
@@ -50,13 +53,13 @@ def montar_tabuleiro(nome_arquivo):
 def print_tabuleiro(tabuleiro):
     tamanho = tabuleiro['tamanho']
     print("Celulas:")
-    for i in range(tamanho):
-        for j in range(tamanho):
-            print(tabuleiro['celulas'][i*tamanho+j],end=' ')
-        print()
+    for i in range(tamanho**2):
+        print(tabuleiro['celulas'][i],end=' ' if (i+1)%tamanho else '\n')
     print("\nRegioes:\n")
     for i in tabuleiro['regioes']:
         print('Regiao',i,'=',tabuleiro['regioes'][i])
+    for i in range(tamanho**2):
+        print(tabuleiro['valores'][i],end=' ' if (i+1)%tamanho else '\n')
 
 def valores_possiveis(tabuleiro):
     t = tabuleiro['tamanho']
@@ -64,21 +67,23 @@ def valores_possiveis(tabuleiro):
 
     #cada indice recebe lista de valores 1..N para celula em regiao tamanho n
     for i in tabuleiro['regioes']:
-        tamanho = len(tabuleiro['regioes'])
+        tamanho = len(tabuleiro['regioes'][i])
         presentes = []
         for j in tabuleiro['regioes'][i]:
             valor = tabuleiro['celulas'][j][1]
             if valor == 0:
-                valores[i] = [k for k in range(1,tamanho+1)]
+                valores[j] = [k for k in range(1,tamanho+1)]
             else:
                 presentes.append(valor)
 
         print('presentes=',presentes)
         #depois, valores ja definidos em uma regiao sao eliminados
         for j in tabuleiro['regioes'][i]:
-            [valores[tabuleiro['celulas'][tabuleiro['regioes'][i]]].remove(
-                elem
-            ) for elem in presentes]
+            if valores[j]:
+                for elem in presentes:
+                    valores[j].remove(
+                        elem
+                    )
 
     #entao, valores adjacentes sao eliminados
     for i in range(tabuleiro['tamanho']**2):
@@ -91,7 +96,7 @@ def valores_possiveis(tabuleiro):
         if i % t != t-1 and tabuleiro['celulas'][i+1][1] in valores[i]: #direita
             valores[i].remove(tabuleiro['celulas'][i+1][1])
 
-    return valores
+    tabuleiro['valores'] = valores
 
 
 
@@ -141,5 +146,4 @@ def backtracking(tabuleiro):
 
 teste = montar_tabuleiro('Puzzles/Kojun_12.txt')
 print_tabuleiro(teste)
-for i in valores_possiveis(teste):
-    print(i)
+
