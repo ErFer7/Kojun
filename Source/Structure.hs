@@ -9,6 +9,7 @@ module Structure (Cell,
                   getCell,
                   getCellRegion,
                   getCellValue,
+                  setCellValue,
                   getRegion,
                   getRegions,
                   getRegionIndexes,
@@ -57,6 +58,13 @@ getRegionsAux :: [Int] -> Puzzle -> [Region]
 getRegionsAux [] _ = []
 getRegionsAux (a:b) puzzle = [getRegion a puzzle] ++ getRegionsAux b puzzle
 
+-- Função auxiliar para encontrar celulas vazias
+getFreeCellsAux :: [Int] -> Puzzle -> [Int]
+getFreeCellsAux [] _ = []
+getFreeCellsAux (a:b) p
+    | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsAux b p
+    | otherwise = getFreeCellsAux b p
+
 -- Construção e acesso --------------------------------------------------------
 -- Constrói o puzzle com base no tipo
 buildPuzzle :: Int -> [Int] -> [Int] -> Puzzle
@@ -68,7 +76,7 @@ getCell2D x y (size, cells) = cells!!(y * size + x)
 
 -- Obtém a célula no índice i (Unidimensionalmente)
 getCell :: Int -> Puzzle -> Cell
-getCell i (size, cells) = cells!!i
+getCell i (_, cells) = cells!!i
 
 -- Obtém a região da célula
 getCellRegion :: Cell -> Int
@@ -77,6 +85,12 @@ getCellRegion (region, _) = region
 -- Obtém o valor da célula
 getCellValue :: Cell -> Int
 getCellValue (_, value) = value
+
+-- Define a célula no índice i (Unidimensionalmente)
+setCellValue :: Int -> Int -> Puzzle -> Puzzle
+setCellValue i v (size, cells) = (size, (fst (splitAt i cells)) ++
+                                        [((getCellRegion (getCell i (size, cells))), v)] ++
+                                        (snd (splitAt i cells)))
 
 -- Obtém uma região
 getRegion :: Int -> Puzzle -> Region
@@ -95,14 +109,7 @@ getValuesInRegion :: Region -> Puzzle -> [Int]
 getValuesInRegion (_, []) _ = []
 getValuesInRegion (r, (a:b)) puzzle = [getCellValue (getCell a puzzle)] ++ getValuesInRegion (r, b) puzzle
 
--- Funcao auxiliar para encontrar celulas vazias
-getFreeCellsAux :: [Int] -> Puzzle -> [Int]
-getFreeCellsAux [] _ = []
-getFreeCellsAux (a:b) p
-    | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsAux b p
-    | otherwise = getFreeCellsAux b p
-
 -- Obtém coordenadas de celulas vazias em uma regiao
 getFreeCellsInRegion :: Region -> Puzzle -> [Int]
-getFreeCellsInRegion (_,[]) _ = []
-getFreeCellsInRegion (i,coords) p = getFreeCellsAux coords p
+getFreeCellsInRegion (_, []) _ = []
+getFreeCellsInRegion (i, coords) p = getFreeCellsAux coords p

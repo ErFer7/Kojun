@@ -10,10 +10,10 @@
     TODO:
     [X] Parser e Structure
     [X] Printer
-    [ ] Solver                (2022-06-01)
-    [ ] Aprimorar o algoritmo (2022-06-01)
-    [ ] Arrumar tudo          (2022-06-01)
-    [ ] Relatório             (2022-06-01)
+    [ ] Solver                (2022-06-02)
+    [ ] Aprimorar o algoritmo (2022-06-03)
+    [ ] Arrumar tudo          (2022-06-04)
+    [ ] Relatório             (2022-06-04)
 -}
 
 import Structure
@@ -36,7 +36,7 @@ main = do
     let regions = getRegions puzzle
     --let possible = getPossibleValues puzzle
 
-    let testRegion = 2 -- Modificar aqui para testar valores diferentes 
+    let testRegion = 0 -- Modificar aqui para testar valores diferentes
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
     putStr (buildPuzzleStr puzzle)
@@ -45,3 +45,4 @@ main = do
     print (show (checkCell 0 0 (regions!!testRegion) puzzle))
     print (show (getPossibleValues 1 (getValuesInRegion (regions!!testRegion) puzzle)))
     print (show (getFreeCellsInRegion (regions!!testRegion) puzzle))
+    putStr (buildPuzzleStr (setCellValue 0 8 puzzle))

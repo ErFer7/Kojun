@@ -18,6 +18,7 @@ module Solver(checkCell, getPossibleValues) where
 
 import Structure
 import Data.List (permutations)
+-- import System.Random (randomR)
 
 -- Auxiliares ------------------------------------------------------------------
 -- Conta quantas vezes um valor aparece na lista
@@ -73,42 +74,23 @@ getPossibleValues i values
 
 -- Cria lista de permutacoes para os valores possiveis de uma regiao
 getPossibleValuesPermutation :: Int -> Region -> Puzzle -> [[Int]]
-getPossibleValuesPermutation i (n,_) _ = []
+getPossibleValuesPermutation i (n, []) _ = []
 getPossibleValuesPermutation i r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
-    
 
-
+--
+-- insertRandomValue :: Int -> [Int] -> Puzzle -> Puzzle
+-- insertRandomValue _ [] puzzle = puzzle
+-- insertRandomValue i l = (\l g -> l !! fst (randomR (0, length l) g))
 
 -- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
 -- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
 
+-- Resolve ---------------------------------------------------------------------
+
 --------------------------------------------------------------------------------
-
 {-
-removeElement :: Int -> [Int] -> [Int]
-removeElement n [] = []
-removeElement n (a:b) =
-    if a == n then
-          removeElement n b
-    else
-          [a] ++ removeElement n b
-
-removeSubList :: [Int] -> [Int] -> [Int]
-removeSubList [] a = a
-removeSubList (a:b) c =
-    removeSubList b (removeElement a c)
-
-iterRegionCells :: Region -> [Int]
-iterRegionCells [] = []
-iterRegionCells (a:b) =
-    let present = iterRegionCells b
-        val = getCellValue (getCell a) in iterRegionCells
-    if val /= 0:
-        present ++ [val]
-    present
-
 getPossibleAt :: Int -> [Int]
 getPossibleAt i =
     let cell = getCell i
