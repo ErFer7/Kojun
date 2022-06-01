@@ -14,7 +14,7 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(checkCell) where
+module Solver(checkCell, getPossibleValues) where
 
 import Structure
 
@@ -63,7 +63,13 @@ checkCell x y region puzzle
       checkVerticalGreatness x y puzzle = True
     | otherwise = False
 
--- TODO: Função para obter valores possíveis
+-- Obtém os valores possíveis para uma região com base nos valores dela
+getPossibleValues :: Int -> [Int] -> [Int]
+getPossibleValues i values
+    | i - 1 >= length values = []
+    | count i values == 0 = [i] ++ getPossibleValues (i + 1) values
+    | otherwise = getPossibleValues (i + 1) values
+
 -- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
 -- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
 
