@@ -18,7 +18,6 @@
 
 import Structure
 import Parser
-import Solver
 import Printer
 import Solver
 
@@ -37,9 +36,12 @@ main = do
     let regions = getRegions puzzle
     --let possible = getPossibleValues puzzle
 
+    let testRegion = 2 -- Modificar aqui para testar valores diferentes 
+
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
     putStr (buildPuzzleStr puzzle)
     print (show (regions!!0))
-    print (show (getValuesInRegion (regions!!0) puzzle))
-    print (show (checkCell 0 0 (regions!!0) puzzle))
-    print (show (getPossibleValues 1 (getValuesInRegion (regions!!0) puzzle)))
+    print (show (getValuesInRegion (regions!!testRegion) puzzle))
+    print (show (checkCell 0 0 (regions!!testRegion) puzzle))
+    print (show (getPossibleValues 1 (getValuesInRegion (regions!!testRegion) puzzle)))
+    print (show (getFreeCellsInRegion (regions!!testRegion) puzzle))

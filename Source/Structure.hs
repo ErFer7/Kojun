@@ -12,7 +12,9 @@ module Structure (Cell,
                   getRegion,
                   getRegions,
                   getRegionIndexes,
-                  getValuesInRegion) where
+                  getValuesInRegion,
+                  getFreeCellsAux,
+                  getFreeCellsInRegion) where
 
 -- Tipos ----------------------------------------------------------------------
 type Cell = (Int, Int)      -- celula = (regiao,valor)
@@ -92,3 +94,15 @@ getRegionIndexes (_, cells) = getRegionIndexesAux [] cells
 getValuesInRegion :: Region -> Puzzle -> [Int]
 getValuesInRegion (_, []) _ = []
 getValuesInRegion (r, (a:b)) puzzle = [getCellValue (getCell a puzzle)] ++ getValuesInRegion (r, b) puzzle
+
+-- Funcao auxiliar para encontrar celulas vazias
+getFreeCellsAux :: [Int] -> Puzzle -> [Int]
+getFreeCellsAux [] _ = []
+getFreeCellsAux (a:b) p
+    | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsAux b p
+    | otherwise = getFreeCellsAux b p
+
+-- Obtém coordenadas de celulas vazias em uma regiao
+getFreeCellsInRegion :: Region -> Puzzle -> [Int]
+getFreeCellsInRegion (_,[]) _ = []
+getFreeCellsInRegion (i,coords) p = getFreeCellsAux coords p

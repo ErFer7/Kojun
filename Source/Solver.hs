@@ -17,6 +17,7 @@ Isso melhora a quantidade de solucoes possiveis
 module Solver(checkCell, getPossibleValues) where
 
 import Structure
+import Data.List (permutations)
 
 -- Auxiliares ------------------------------------------------------------------
 -- Conta quantas vezes um valor aparece na lista
@@ -69,6 +70,16 @@ getPossibleValues i values
     | i - 1 >= length values = []
     | count i values == 0 = [i] ++ getPossibleValues (i + 1) values
     | otherwise = getPossibleValues (i + 1) values
+
+-- Cria lista de permutacoes para os valores possiveis de uma regiao
+getPossibleValuesPermutation :: Int -> Region -> Puzzle -> [[Int]]
+getPossibleValuesPermutation i (n,_) _ = []
+getPossibleValuesPermutation i r puzzle =
+    permutations values where
+        values = getPossibleValues 1 (getValuesInRegion r puzzle)
+    
+
+
 
 -- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
 -- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking

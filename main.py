@@ -1,6 +1,7 @@
+import random
 
-'extrair dados do tabuleiro'
 def abrir_arquivo(nome):
+    'extrair dados do tabuleiro'
     dados = {}
     with open(nome,'r') as f:
         t = int(f.readline())
@@ -25,21 +26,18 @@ def criar_tabuleiro(dados):
 
     tabuleiro['tamanho'] = t
 
-    'coloca [valor_inicial, regiao, imutavel] na matriz'
+    'coloca [valor_inicial, regiao] na matriz'
     tabuleiro['celulas']=[
-            [
-                dados['regioes'][i],       # valor inicial
-                dados['iniciais'][i]        # regiao a qual pertence
-            ] for i in range(t**2)
-        ]
+        dados['iniciais'][i] for i in range(t**2) # valor inicial    
+    ]
 
     'coloca coordenadas da celula na regiao correspondente'
     tabuleiro['regioes'] = {}
     for i in range(t**2):
-        if tabuleiro['celulas'][i][0] in tabuleiro['regioes']:
-            tabuleiro['regioes'][tabuleiro['celulas'][i][0]].append(i)
+        if dados['regioes'][i] in tabuleiro['regioes']:
+            tabuleiro['regioes'][dados['regioes'][i]].append(i)
         else:
-            tabuleiro['regioes'][tabuleiro['celulas'][i][0]] = [i]
+            tabuleiro['regioes'][dados['regioes'][i]] = [i]
 
     'calcula valores possiveis para cada celula no comeco'
     valores_possiveis(tabuleiro)
@@ -51,6 +49,9 @@ def montar_tabuleiro(nome_arquivo):
     return tab
 
 def print_tabuleiro(tabuleiro):
+    if not tabuleiro:
+        print("Solucao nao encontrada")
+        return
     tamanho = tabuleiro['tamanho']
     print("Celulas:")
     for i in range(tamanho**2):
@@ -58,10 +59,28 @@ def print_tabuleiro(tabuleiro):
     print("\nRegioes:\n")
     for i in tabuleiro['regioes']:
         print('Regiao',i,'=',tabuleiro['regioes'][i])
-    for i in range(tamanho**2):
-        print(tabuleiro['valores'][i],end=' ' if (i+1)%tamanho else '\n')
+    print("\nValores Possiveis para celulas vazias\n")
+    for i in tabuleiro['valores']:
+        print('Regiao',i,'=',tabuleiro['valores'][i])
 
 def valores_possiveis(tabuleiro):
+    valores = {i:[] for i in tabuleiro['regioes']}
+
+    for indice_regiao in tabuleiro['regioes']:
+        valores[indice_regiao] = [i+1 for i in range(len(tabuleiro['regioes'][indice_regiao]))]
+        for coord in tabuleiro['regioes'][indice_regiao]:
+            valor = tabuleiro['celulas'][coord]
+            if valor != 0:
+                valores[indice_regiao].remove(valor)
+    
+    tabuleiro['valores'] = valores
+
+
+
+
+
+def valores_possiveis_v1(tabuleiro):
+    # METODO DIFERENTE UTILIZADO PARA SIMPLIFICAR ALGORITMO DE TENTATIVA
     t = tabuleiro['tamanho']
     valores = [[] for i in range(tabuleiro['tamanho']**2)]
 
@@ -84,7 +103,7 @@ def valores_possiveis(tabuleiro):
                     valores[j].remove(
                         elem
                     )
-
+    
     #entao, valores adjacentes sao eliminados
     for i in range(tabuleiro['tamanho']**2):
         if i // t != 0 and tabuleiro['celulas'][i-t][1] in valores[i]: #acima
@@ -140,10 +159,52 @@ def backtrack(c):
         s = next(P, s)
 
 '''
+def checar_insercao_vizinhos(pos,val,tabuleiro):
+    t = tabuleiro['tamanho']
+    return not (
+        (pos // t != 0 and tabuleiro['celulas'][pos-t] == val) or
+        (pos // t != t-1 and tabuleiro['celulas'][pos+t] == val) or
+        (pos % t != 0 and tabuleiro['celulas'][pos-1] == val) or
+        (pos % t != t-1 and tabuleiro['celulas'][pos+1] == val)
+    )
 
 def backtracking(tabuleiro):
     pass
 
+def aleatorio(tabuleiro:dict,tolerancia:int=99,tentativas=10):
+    original = tabuleiro.copy()
+    resolvido = False
+    for tries in range(tentativas):
+        tabuleiro = original.copy()
+        procurando = True
+        for i in tabuleiro['regioes']:
+            for iteracao in range(tolerancia):
+                aleas = random.sample(tabuleiro['regioes'][i],len(tabuleiro['regioes'][i]))
+                for j in range(len(aleas)):
+                    if not checar_insercao_vizinhos(
+                        aleas[j],
+                        tabuleiro['valores'][i][j], 
+                        tabuleiro):
+                        break
+                else:
+                    for item in range(len(tabuleiro['regioes'][i])):
+                        tabuleiro['celulas'][tabuleiro['regioes'][i][item]] = aleas[item]
+                    procurando = False
+                    break
+            if procurando == False:
+                break
+        else:
+            resolvido = True
+        if resolvido: 
+            break
+    if resolvido:
+        return tabuleiro
+    else:
+        return False
+        
+'''
 teste = montar_tabuleiro('Puzzles/Kojun_12.txt')
+teste = aleatorio(teste)
 print_tabuleiro(teste)
-
+'''
+print('\n\nesquece, vamo direto pra Haskell')
