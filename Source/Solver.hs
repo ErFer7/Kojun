@@ -73,15 +73,8 @@ getPossibleValues i values
     | otherwise = getPossibleValues (i + 1) values
 
 -- Cria lista de permutacoes para os valores possiveis de uma regiao
-<<<<<<< HEAD
-getPossibleValuesPermutation :: Int -> Region -> Puzzle -> [[Int]]
-getPossibleValuesPermutation i (n, []) _ = []
-getPossibleValuesPermutation i r puzzle =
-    permutations values where
-        values = getPossibleValues 1 (getValuesInRegion r puzzle)
-=======
-getPossibleValuesPermutation ::  Region -> Puzzle -> [[Int]]
-getPossibleValuesPermutation (n,[]) _ = []
+getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
+getPossibleValuesPermutation (n, []) _ = []
 getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
@@ -116,9 +109,6 @@ fillRegionWithValues [a,values] [b,coords] puzzle = do
 -}
 backtracking :: Region -> Puzzle -> Puzzle
 backtracking _ p = p
-
-
->>>>>>> 3fee7550b3a36ee7d9def9d21edc05edc70d305f
 
 --
 -- insertRandomValue :: Int -> [Int] -> Puzzle -> Puzzle
