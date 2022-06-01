@@ -51,3 +51,9 @@ Trabalho 1 de Paradigmas de Programação
 ## v0.6.1
 
 * Checagem corrigida.
+
+---
+
+## v0.7
+
+* Função para a obtenção de valores possíveis implementada.

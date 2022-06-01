@@ -1,6 +1,6 @@
 {-  Trabalho 1 de Paradigmas de Programação
     Grupo: Eric e Otávio
-    v0.6.1
+    v0.7
 
     Funcionamento:
     Leitura e montagem do tabuleiro
@@ -26,7 +26,7 @@ main = do
 
     putStr ("----------------\nTrabalho 1\nEric e Otávio\n----------------\n\n")
 
-    testStr <- readFile "Puzzles/Kojun_12_TEST.txt"
+    testStr <- readFile "Puzzles/Kojun_12.txt"
 
     let inputInt = inputStrToInt testStr
     let size = getSize inputInt
@@ -42,3 +42,4 @@ main = do
     print (show (regions!!0))
     print (show (getValuesInRegion (regions!!0) puzzle))
     print (show (checkCell 0 0 (regions!!0) puzzle))
+    print (show (getPossibleValues 1 (getValuesInRegion (regions!!0) puzzle)))
