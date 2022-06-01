@@ -18,6 +18,7 @@ module Solver(checkCell, getPossibleValues) where
 
 import Structure
 import Data.List (permutations)
+-- import System.Random (randomR)
 
 -- Auxiliares ------------------------------------------------------------------
 -- Conta quantas vezes um valor aparece na lista
@@ -72,8 +73,8 @@ getPossibleValues i values
     | otherwise = getPossibleValues (i + 1) values
 
 -- Cria lista de permutacoes para os valores possiveis de uma regiao
-getPossibleValuesPermutation ::  Region -> Puzzle -> [[Int]]
-getPossibleValuesPermutation (n,[]) _ = []
+getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
+getPossibleValuesPermutation (n, []) _ = []
 getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
@@ -115,14 +116,17 @@ backtracking :: Int -> Puzzle -> Puzzle
 backtracking _ p = do
 
 
-
-
+--
+-- insertRandomValue :: Int -> [Int] -> Puzzle -> Puzzle
+-- insertRandomValue _ [] puzzle = puzzle
+-- insertRandomValue i l = (\l g -> l !! fst (randomR (0, length l) g))
 
 -- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
 -- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
 
---------------------------------------------------------------------------------
+-- Resolve ---------------------------------------------------------------------
 
+--------------------------------------------------------------------------------
 {-
 getPossibleAt :: Int -> [Int]
 getPossibleAt i =
