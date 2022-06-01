@@ -1,6 +1,6 @@
 {-  Trabalho 1 de Paradigmas de Programação
     Grupo: Eric e Otávio
-    v0.3.3
+    v0.6.1
 
     Funcionamento:
     Leitura e montagem do tabuleiro
@@ -8,12 +8,12 @@
     Exibição do resultado
 
     TODO:
-    [X] v0.2: Parser e Structure
-    [X] v0.3: Printer
-    [ ] v0.4: Solver                (2022-05-28)
-    [ ] v0.5: Aprimorar o algoritmo (2022-05-29)
-    [ ] v1.0: Arrumar tudo          (2022-05-29)
-    [ ] Relatório                   (2022-05-30)
+    [X] Parser e Structure
+    [X] Printer
+    [ ] Solver                (2022-06-01)
+    [ ] Aprimorar o algoritmo (2022-06-01)
+    [ ] Arrumar tudo          (2022-06-01)
+    [ ] Relatório             (2022-06-01)
 -}
 
 import Structure
@@ -26,7 +26,7 @@ main = do
 
     putStr ("----------------\nTrabalho 1\nEric e Otávio\n----------------\n\n")
 
-    testStr <- readFile "Puzzles/Kojun_12.txt"
+    testStr <- readFile "Puzzles/Kojun_12_TEST.txt"
 
     let inputInt = inputStrToInt testStr
     let size = getSize inputInt
@@ -41,3 +41,4 @@ main = do
     putStr (buildPuzzleStr puzzle)
     print (show (regions!!0))
     print (show (getValuesInRegion (regions!!0) puzzle))
+    print (show (checkCell 0 0 (regions!!0) puzzle))

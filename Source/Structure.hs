@@ -3,6 +3,7 @@
 
 module Structure (Cell,
                   Puzzle,
+                  Region,
                   buildPuzzle,
                   getCell2D,
                   getCell,
@@ -16,7 +17,7 @@ module Structure (Cell,
 -- Tipos ----------------------------------------------------------------------
 type Cell = (Int, Int)      -- celula = (regiao,valor)
 type Puzzle = (Int, [Cell]) -- tabuleiro = (tamanho,[celulas])
-type Region = [Int]         -- regiao = [coords]
+type Region = (Int, [Int])  -- regiao = [coords]
 
 -- Auxiliares -----------------------------------------------------------------
 -- Constrói uma lista de células
@@ -39,20 +40,20 @@ getRegionIndexesAux regionIndexes (a:b)
     | otherwise = [getCellRegion a] ++ getRegionIndexesAux (regionIndexes ++ [getCellRegion a]) b
 
 -- Função auxiliar para a obtenção de uma região
-getRegionAux :: Int -> Int -> Puzzle -> Region
-getRegionAux r i (size, cells) =
+getRegionCellIndexesAux :: Int -> Int -> Puzzle -> [Int]
+getRegionCellIndexesAux r i (size, cells) =
     if i < size^2 then
         if getCellRegion (getCell i (size, cells)) == r then
-            [i] ++ getRegionAux r (i + 1) (size, cells)
+            [i] ++ getRegionCellIndexesAux r (i + 1) (size, cells)
         else
-            getRegionAux r (i + 1) (size, cells)
+            getRegionCellIndexesAux r (i + 1) (size, cells)
     else
         []
 
 -- Função auxiliar para a obtenção de regiões
 getRegionsAux :: [Int] -> Puzzle -> [Region]
 getRegionsAux [] _ = []
-getRegionsAux (a:b) puzzle = [getRegionAux a 0 puzzle] ++ getRegionsAux b puzzle
+getRegionsAux (a:b) puzzle = [getRegion a puzzle] ++ getRegionsAux b puzzle
 
 -- Construção e acesso --------------------------------------------------------
 -- Constrói o puzzle com base no tipo
@@ -77,7 +78,7 @@ getCellValue (_, value) = value
 
 -- Obtém uma região
 getRegion :: Int -> Puzzle -> Region
-getRegion r puzzle = getRegionAux r 0 puzzle
+getRegion r puzzle = (r, getRegionCellIndexesAux r 0 puzzle)
 
 -- Obtém uma lista de regiões
 getRegions :: Puzzle -> [Region]
@@ -89,5 +90,5 @@ getRegionIndexes (_, cells) = getRegionIndexesAux [] cells
 
 -- Obtém os valores em uma região
 getValuesInRegion :: Region -> Puzzle -> [Int]
-getValuesInRegion [] _ = []
-getValuesInRegion (a:b) puzzle = [getCellValue (getCell a puzzle)] ++ getValuesInRegion b puzzle
+getValuesInRegion (_, []) _ = []
+getValuesInRegion (r, (a:b)) puzzle = [getCellValue (getCell a puzzle)] ++ getValuesInRegion (r, b) puzzle
