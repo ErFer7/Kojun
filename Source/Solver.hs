@@ -78,6 +78,11 @@ getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
 
+getWorkingPermutation :: Int -> Puzzle -> Int -> [[Int]] -> [Int]
+getWorkingPermutation region puzzle iter perms =
+    fillRegionWithValues (perms!!iter) (getFreeCellsInRegion (getRegion region puzzle) puzzle)
+
+
 -- Testa se todos os valores, apos insercao, sao validos
 testingRegion :: Region -> Puzzle -> Int -> Bool
 testingRegion (regSize,[a:b]) (puzSize,cellList) iter
@@ -106,8 +111,9 @@ fillRegionWithValues [a,values] [b,coords] puzzle = do
       de valores validos
       se nao, retorna falso
 -}
-backtracking :: Region -> Puzzle -> Puzzle
-backtracking _ p = p
+backtracking :: Int -> Puzzle -> Puzzle
+backtracking _ p = do
+
 
 
 
