@@ -72,12 +72,43 @@ getPossibleValues i values
     | otherwise = getPossibleValues (i + 1) values
 
 -- Cria lista de permutacoes para os valores possiveis de uma regiao
-getPossibleValuesPermutation :: Int -> Region -> Puzzle -> [[Int]]
-getPossibleValuesPermutation i (n,_) _ = []
-getPossibleValuesPermutation i r puzzle =
+getPossibleValuesPermutation ::  Region -> Puzzle -> [[Int]]
+getPossibleValuesPermutation (n,[]) _ = []
+getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
-    
+
+-- Testa se todos os valores, apos insercao, sao validos
+testingRegion :: Region -> Puzzle -> Int -> Bool
+testingRegion (regSize,[a:b]) (puzSize,cellList) iter
+    | (iter == regSize) = True
+    | (checkCell (mod a puzSize) (div a puzSize) == False) = False
+    | otherwise = testingRegion (a,c) puzzle iter
+
+-- coloca n valores em n celulas
+fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Bool
+fillRegionWithValues [] [] _ = False
+fillRegionWithValues [a,values] [b,coords] puzzle = do
+    setCellValue b a puzzle
+    fillRegionWithValues values coords puzzle
+    return True
+
+{-
+    metodo backtracking, recebe regiao e puzzle, retorna bool
+    passo 1) preencher uma regiao com valores validos
+    passo 2) checar se valores sao validos
+    passo 3)
+      se valido, backtracking da regiao seguinte
+        se nao houver regiao reguinte, retorna verdadeiro
+      se nao valido, retorna falso
+    passo 4) se retornou falso,
+      se ha mais permutacoes possiveis, volta pro comeco e tenta proxima permutacao
+      de valores validos
+      se nao, retorna falso
+-}
+backtracking :: Region -> Puzzle -> Puzzle
+backtracking _ p = p
+
 
 
 
@@ -87,28 +118,6 @@ getPossibleValuesPermutation i r puzzle =
 --------------------------------------------------------------------------------
 
 {-
-removeElement :: Int -> [Int] -> [Int]
-removeElement n [] = []
-removeElement n (a:b) =
-    if a == n then
-          removeElement n b
-    else
-          [a] ++ removeElement n b
-
-removeSubList :: [Int] -> [Int] -> [Int]
-removeSubList [] a = a
-removeSubList (a:b) c =
-    removeSubList b (removeElement a c)
-
-iterRegionCells :: Region -> [Int]
-iterRegionCells [] = []
-iterRegionCells (a:b) =
-    let present = iterRegionCells b
-        val = getCellValue (getCell a) in iterRegionCells
-    if val /= 0:
-        present ++ [val]
-    present
-
 getPossibleAt :: Int -> [Int]
 getPossibleAt i =
     let cell = getCell i
