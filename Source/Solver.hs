@@ -14,7 +14,7 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver where
+module Solver(checkCell) where
 
 import Structure
 
@@ -26,33 +26,39 @@ count v (a:b)
     | a == v = 1 + count v b
     | otherwise = count v b
 
--- Checa se um valor não se repete na região
+-- Checa se um valor não se repete na região (Exceto 0)
 checkRegionRepetition :: [Int] -> Bool
 checkRegionRepetition [] = True
-checkRegionRepetition (a:b)
-    | count (length (a:b)) (a:b) <= 1 = checkRegionRepetition b
-    | otherwise = False
+checkRegionRepetition (a:b) =
+    if a /= 0 then
+        if count a (a:b) == 1 then
+            checkRegionRepetition b
+        else
+            False
+    else
+        checkRegionRepetition b
 
 -- Checa se todas as células adjacentes são diferentes
 checkOrthogonalDifference :: Int -> Int -> Puzzle -> Bool
 checkOrthogonalDifference x y puzzle
-    | getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y + 1) puzzle) &&
-      getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y - 1) puzzle) &&
-      getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x + 1) y puzzle) &&
-      getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x - 1) y puzzle) = True
+    | (y + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y + 1) puzzle)) &&
+      (y - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y - 1) puzzle)) &&
+      (x + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x + 1) y puzzle)) &&
+      (x - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x - 1) y puzzle)) = True
     | otherwise = False
 
 -- Checa se a célula superior é maior que a atual
 checkVerticalGreatness :: Int -> Int -> Puzzle -> Bool
 checkVerticalGreatness x y puzzle
-    | getCellValue (getCell2D x y puzzle) < getCellValue (getCell2D x (y + 1) puzzle) ||
-      getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y + 1) puzzle) = True
+    | y - 1 < 0 ||
+      getCellValue (getCell2D x y puzzle) < getCellValue (getCell2D x (y - 1) puzzle) ||
+      getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y - 1) puzzle) = True
     | otherwise = False
 
 -- Checa todas as regras para uma célula
-checkCell :: Int -> Int -> Puzzle -> Bool
-checkCell x y puzzle
-    | checkRegionRepetition (getValuesInRegion (getRegion (getCellRegion (getCell2D x y puzzle)) puzzle) puzzle) &&
+checkCell :: Int -> Int -> Region -> Puzzle -> Bool
+checkCell x y region puzzle
+    | checkRegionRepetition (getValuesInRegion region puzzle) &&
       checkOrthogonalDifference x y puzzle &&
       checkVerticalGreatness x y puzzle = True
     | otherwise = False
