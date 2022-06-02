@@ -14,8 +14,8 @@ module Structure (Cell,
                   getRegions,
                   getRegionIndexes,
                   getValuesInRegion,
-                  getFreeCellsAux,
-                  getFreeCellsInRegion) where
+                  getFreeCellsInRegion,
+                  getFreeCells) where
 
 -- Tipos ----------------------------------------------------------------------
 type Cell = (Int, Int)      -- celula = (regiao,valor)
@@ -59,11 +59,21 @@ getRegionsAux [] _ = []
 getRegionsAux (a:b) puzzle = [getRegion a puzzle] ++ getRegionsAux b puzzle
 
 -- Função auxiliar para encontrar celulas vazias
-getFreeCellsAux :: [Int] -> Puzzle -> [Int]
-getFreeCellsAux [] _ = []
-getFreeCellsAux (a:b) p
-    | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsAux b p
-    | otherwise = getFreeCellsAux b p
+getFreeCellsInRegionAux :: [Int] -> Puzzle -> [Int]
+getFreeCellsInRegionAux [] _ = []
+getFreeCellsInRegionAux (a:b) p
+    | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsInRegionAux b p
+    | otherwise = getFreeCellsInRegionAux b p
+
+getFreeCellsAux :: Int -> Puzzle -> [Int]
+getFreeCellsAux i (size, cells) =
+    if i < size^2 then
+        if getCellValue (getCell i (size, cells)) == 0 then
+            [i] ++ getFreeCellsAux (i + 1) (size, cells)
+        else
+            getFreeCellsAux (i + 1) (size, cells)
+    else
+        []
 
 -- Construção e acesso --------------------------------------------------------
 -- Constrói o puzzle com base no tipo
@@ -112,4 +122,8 @@ getValuesInRegion (r, (a:b)) puzzle = [getCellValue (getCell a puzzle)] ++ getVa
 -- Obtém coordenadas de celulas vazias em uma regiao
 getFreeCellsInRegion :: Region -> Puzzle -> [Int]
 getFreeCellsInRegion (_, []) _ = []
-getFreeCellsInRegion (i, coords) p = getFreeCellsAux coords p
+getFreeCellsInRegion (i, coords) p = getFreeCellsInRegionAux coords p
+
+-- Obtém uma lista de células livres no tabuleiro inteiro
+getFreeCells :: Puzzle -> [Int]
+getFreeCells puzzle = getFreeCellsAux 0 puzzle
