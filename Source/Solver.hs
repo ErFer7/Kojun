@@ -14,7 +14,7 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(checkCell, getPossibleValues) where
+module Solver(checkCell, getPossibleValues,testingRegion) where
 
 import Structure
 import Data.List (permutations)
@@ -62,7 +62,8 @@ checkCell :: Int -> Int -> Region -> Puzzle -> Bool
 checkCell x y region puzzle
     | checkRegionRepetition (getValuesInRegion region puzzle) &&
       checkOrthogonalDifference x y puzzle &&
-      checkVerticalGreatness x y puzzle = True
+      checkVerticalGreatness x y puzzle &&
+      (getCellValue (getCell2D x y puzzle) /= 0) = True
     | otherwise = False
 
 -- Obtém os valores possíveis para uma região com base nos valores dela
@@ -79,25 +80,18 @@ getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
 
-getWorkingPermutation :: Int -> Puzzle -> Int -> [[Int]] -> [Int]
-getWorkingPermutation region puzzle iter perms =
-    fillRegionWithValues (perms!!iter) (getFreeCellsInRegion (getRegion region puzzle) puzzle)
-
-
 -- Testa se todos os valores, apos insercao, sao validos
 testingRegion :: Region -> Puzzle -> Int -> Bool
-testingRegion (regSize,[a:b]) (puzSize,cellList) iter
-    | (iter == regSize) = True
-    | (checkCell (mod a puzSize) (div a puzSize) == False) = False
-    | otherwise = testingRegion (a,c) puzzle iter
+testingRegion (n,coords) (puzSize,cellList) iter
+    | (iter == length coords) = True
+    | ((checkCell (mod (coords!!iter) puzSize) (div (coords!!iter) puzSize) (n,coords) (puzSize,cellList)) == False) = False
+    | otherwise = (testingRegion (n,coords) (puzSize,cellList) (iter+1))
 
 -- coloca n valores em n celulas
 fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Bool
-fillRegionWithValues [] [] _ = False
-fillRegionWithValues [a,values] [b,coords] puzzle = do
-    setCellValue b a puzzle
-    fillRegionWithValues values coords puzzle
-    return True
+fillRegionWithValues [] [] _ = True
+fillRegionWithValues (a:values) (b:coords) puzzle =
+    (fillRegionWithValues values coords puzzle) where puzzle = (setCellValue b a puzzle)
 
 {-
     metodo backtracking, recebe regiao e puzzle, retorna bool
@@ -112,8 +106,8 @@ fillRegionWithValues [a,values] [b,coords] puzzle = do
       de valores validos
       se nao, retorna falso
 -}
-backtracking :: Int -> Puzzle -> Puzzle
-backtracking _ p = do
+--backtracking :: Int -> Puzzle -> Puzzle
+--backtracking _ p = do
 
 
 --

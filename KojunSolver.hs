@@ -45,4 +45,5 @@ main = do
     print (show (checkCell 0 0 (regions!!testRegion) puzzle))
     print (show (getPossibleValues 1 (getValuesInRegion (regions!!testRegion) puzzle)))
     print (show (getFreeCellsInRegion (regions!!testRegion) puzzle))
-    putStr (buildPuzzleStr (setCellValue 0 8 puzzle))
+    print (show (testingRegion (regions!!testRegion) puzzle 0))
+    print (show (getValuesInRegion (regions!!testRegion) puzzle))
