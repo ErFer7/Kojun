@@ -14,7 +14,7 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(checkCell, getPossibleValues,testingRegion) where
+module Solver(checkCell, getPossibleValues,testingRegion,backtracking) where
 
 import Structure
 import Data.List (permutations)
@@ -84,14 +84,18 @@ getPossibleValuesPermutation r puzzle =
 testingRegion :: Region -> Puzzle -> Int -> Bool
 testingRegion (n,coords) (puzSize,cellList) iter
     | (iter == length coords) = True
-    | ((checkCell (mod (coords!!iter) puzSize) (div (coords!!iter) puzSize) (n,coords) (puzSize,cellList)) == False) = False
+    | ((checkCell (mod
+        (coords!!iter) puzSize)
+        (div (coords!!iter) puzSize)
+        (n,coords)
+        (puzSize,cellList)) == False) = False
     | otherwise = (testingRegion (n,coords) (puzSize,cellList) (iter+1))
 
 -- coloca n valores em n celulas
-fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Bool
-fillRegionWithValues [] [] _ = True
+fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Puzzle
+fillRegionWithValues [] [] p = p
 fillRegionWithValues (a:values) (b:coords) puzzle =
-    (fillRegionWithValues values coords puzzle) where puzzle = (setCellValue b a puzzle)
+    fillRegionWithValues values coords (setCellValue b a puzzle)
 
 {-
     metodo backtracking, recebe regiao e puzzle, retorna bool
@@ -106,8 +110,16 @@ fillRegionWithValues (a:values) (b:coords) puzzle =
       de valores validos
       se nao, retorna falso
 -}
---backtracking :: Int -> Puzzle -> Puzzle
---backtracking _ p = do
+
+-- atualmente, testa uma regiao apenas
+backtracking :: Int -> Puzzle -> Puzzle
+backtracking regIndex p =
+    fillRegionWithValues (
+        getPossibleValues
+            1
+            (getValuesInRegion (getRegion regIndex p) p))
+        (getFreeCellsInRegion (getRegion regIndex p) p)
+        p
 
 
 --
