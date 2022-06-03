@@ -14,11 +14,7 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-<<<<<<< HEAD
-module Solver(checkCell, getPossibleValues, cellBacktracking, insertValues) where
-=======
-module Solver(checkCell, getPossibleValues,testingRegion,backtracking) where
->>>>>>> ca92f5940d8f0b67245ddac6056d41376abe626c
+module Solver(checkCell, getPossibleValues, cellBacktracking, insertValues, testingRegion, backtracking) where
 
 import Structure
 import Data.List (permutations)
@@ -67,11 +63,7 @@ checkCell x y region puzzle
     | checkRegionRepetition (getValuesInRegion region puzzle) &&
       checkOrthogonalDifference x y puzzle &&
       checkVerticalGreatness x y puzzle &&
-<<<<<<< HEAD
       getCellValue (getCell2D x y puzzle) /= 0 = True
-=======
-      (getCellValue (getCell2D x y puzzle) /= 0) = True
->>>>>>> ca92f5940d8f0b67245ddac6056d41376abe626c
     | otherwise = False
 
 -- Obtém os valores possíveis para uma região com base nos valores dela
@@ -81,7 +73,6 @@ getPossibleValues i values
     | count i values == 0 = [i] ++ getPossibleValues (i + 1) values
     | otherwise = getPossibleValues (i + 1) values
 
-<<<<<<< HEAD
 -- Insere vários valores na célula até que a inserção deixe a célula válida
 insertValues :: Int -> [Int] -> Region -> Puzzle -> (Puzzle, Bool)
 -- insertValues _ [] _ puzzle = (puzzle, False)
@@ -144,7 +135,6 @@ cellBacktracking i freeCells regions (size, cells) = do
 -- insertValue :: Int -> [Int] -> Puzzle -> Puzzle
 -- insertValue _ [] puzzle = puzzle
 -- insertValue i l = (\l g -> l !! fst (randomR (0, length l) g))
-=======
 -- Cria lista de permutacoes para os valores possiveis de uma regiao
 getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
 getPossibleValuesPermutation (n, []) _ = []
@@ -168,7 +158,6 @@ fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Puzzle
 fillRegionWithValues [] [] p = p
 fillRegionWithValues (a:values) (b:coords) puzzle =
     fillRegionWithValues values coords (setCellValue b a puzzle)
->>>>>>> ca92f5940d8f0b67245ddac6056d41376abe626c
 
 {-
     metodo backtracking, recebe regiao e puzzle, retorna bool
@@ -183,10 +172,8 @@ fillRegionWithValues (a:values) (b:coords) puzzle =
       de valores validos
       se nao, retorna falso
 -}
-<<<<<<< HEAD
 -- backtracking :: Int -> Puzzle -> Puzzle
 -- backtracking _ p = do
-=======
 
 -- atualmente, testa uma regiao apenas
 backtracking :: Int -> Puzzle -> Puzzle
@@ -206,7 +193,6 @@ backtracking regIndex p =
 
 -- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
 -- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
->>>>>>> ca92f5940d8f0b67245ddac6056d41376abe626c
 
 -- Resolve ---------------------------------------------------------------------
 
