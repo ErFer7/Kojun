@@ -34,18 +34,29 @@ main = do
     let puzzle = buildPuzzle size regions values
     let sizeStr = getSizeStr puzzle
     let regions = getRegions puzzle
-    --let possible = getPossibleValues puzzle
 
-    let testRegion = 2 -- Modificar aqui para testar valores diferentes
+    let testRegion = 7 -- Modificar aqui para testar valores diferentes
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
     putStr (buildPuzzleStr puzzle)
-    print (show (regions!!2))
+
+    -- TESTES -----------------------------------------------------------------
+    print (show (regions!!testRegion))
     print (show (getValuesInRegion (regions!!testRegion) puzzle))
-    print (show (getPossibleValues 1 (getValuesInRegion (regions!!testRegion) puzzle)))
+    print (show (getPossibleValues 0 (getValuesInRegion (regions!!testRegion) puzzle)))
     print (show (getFreeCellsInRegion (regions!!testRegion) puzzle))
     print (show (getFreeCells puzzle))
-    let region = regions!!((getCellRegion (getCell 4 puzzle)) - 1)
-    print (show (insertValues 4 (getPossibleValues (fst region) (getValuesInRegion region puzzle)) region puzzle))
-    let solvedPuzzle = cellBacktracking 0 (getFreeCells puzzle) regions puzzle
-    putStr (buildPuzzleStr solvedPuzzle)
+    let region = regions!!((getCellRegion (getCell 21 puzzle)) - 1)
+    let notnewPuzzle = setCellValue 20 4 puzzle
+    let newPuzzle = setCellValue 21 3 notnewPuzzle
+    putStr (buildPuzzleStr newPuzzle)
+    print (show (checkCell (23 `mod` 10) (23 `div` 10) region newPuzzle))
+    print (show (insertValues 23 (getPossibleValues (fst region) (getValuesInRegion region puzzle)) region puzzle))
+    ---------------------------------------------------------------------------
+
+    putStr ("\n\nResolvendo o puzzle.\n\n")
+
+    -- CUIDADO, O BACKTRAKING FUNCIONA, PORÉM USA 16 GB DE RAM
+    -- Ainda não investiguei o motivo do memory leak
+    -- let solvedPuzzle = cellBacktracking puzzle
+    -- putStr (buildPuzzleStr solvedPuzzle)

@@ -58,13 +58,14 @@ getRegionsAux :: [Int] -> Puzzle -> [Region]
 getRegionsAux [] _ = []
 getRegionsAux (a:b) puzzle = [getRegion a puzzle] ++ getRegionsAux b puzzle
 
--- Função auxiliar para encontrar celulas vazias
+-- Função auxiliar para encontrar celulas vazias em uma região
 getFreeCellsInRegionAux :: [Int] -> Puzzle -> [Int]
 getFreeCellsInRegionAux [] _ = []
 getFreeCellsInRegionAux (a:b) p
     | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsInRegionAux b p
     | otherwise = getFreeCellsInRegionAux b p
 
+-- Função auxiliar para encontrar células vazias no puzzle
 getFreeCellsAux :: Int -> Puzzle -> [Int]
 getFreeCellsAux i (size, cells) =
     if i < size^2 then
@@ -98,9 +99,12 @@ getCellValue (_, value) = value
 
 -- Define a célula no índice i (Unidimensionalmente)
 setCellValue :: Int -> Int -> Puzzle -> Puzzle
-setCellValue i v (size, cells) = (size, (fst (splitAt i cells)) ++
-                                        [((getCellRegion (getCell i (size, cells))), v)] ++
-                                        (snd (splitAt i cells)))
+setCellValue i v (size, cells) = do
+
+    let splitList = splitAt i cells
+    let (a:b) = snd splitList
+
+    (size, (fst splitList) ++ [((getCellRegion (getCell i (size, cells))), v)] ++ b)
 
 -- Obtém uma região
 getRegion :: Int -> Puzzle -> Region

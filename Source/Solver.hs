@@ -14,11 +14,11 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(checkCell, getPossibleValues, cellBacktracking, insertValues, testingRegion, backtracking) where
+module Solver(checkCell, getPossibleValues, cellBacktracking, insertValues, testingRegion, backtracking, checkRegionRepetition) where
 
 import Structure
 import Data.List (permutations)
--- import System.Random (randomR)
+import System.Random
 
 -- Auxiliares ------------------------------------------------------------------
 -- Conta quantas vezes um valor aparece na lista
@@ -42,29 +42,26 @@ checkRegionRepetition (a:b) =
 
 -- Checa se todas as células adjacentes são diferentes
 checkOrthogonalDifference :: Int -> Int -> Puzzle -> Bool
-checkOrthogonalDifference x y puzzle
-    | (y + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y + 1) puzzle)) &&
-      (y - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y - 1) puzzle)) &&
-      (x + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x + 1) y puzzle)) &&
-      (x - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x - 1) y puzzle)) = True
-    | otherwise = False
+checkOrthogonalDifference x y puzzle =
+    (y + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y + 1) puzzle)) &&
+    (y - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D x (y - 1) puzzle)) &&
+    (x + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x + 1) y puzzle)) &&
+    (x - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x - 1) y puzzle))
 
 -- Checa se a célula superior é maior que a atual
 checkVerticalGreatness :: Int -> Int -> Puzzle -> Bool
-checkVerticalGreatness x y puzzle
-    | y - 1 < 0 ||
-      getCellValue (getCell2D x y puzzle) < getCellValue (getCell2D x (y - 1) puzzle) ||
-      getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y - 1) puzzle) = True
-    | otherwise = False
+checkVerticalGreatness x y puzzle =
+    y - 1 < 0 ||
+    getCellValue (getCell2D x y puzzle) < getCellValue (getCell2D x (y - 1) puzzle) ||
+    getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y - 1) puzzle)
 
 -- Checa todas as regras para uma célula
 checkCell :: Int -> Int -> Region -> Puzzle -> Bool
-checkCell x y region puzzle
-    | checkRegionRepetition (getValuesInRegion region puzzle) &&
-      checkOrthogonalDifference x y puzzle &&
-      checkVerticalGreatness x y puzzle &&
-      getCellValue (getCell2D x y puzzle) /= 0 = True
-    | otherwise = False
+checkCell x y region puzzle =
+    checkRegionRepetition (getValuesInRegion region puzzle) &&
+    checkOrthogonalDifference x y puzzle &&
+    checkVerticalGreatness x y puzzle &&
+    getCellValue (getCell2D x y puzzle) /= 0
 
 -- Obtém os valores possíveis para uma região com base nos valores dela
 getPossibleValues :: Int -> [Int] -> [Int]
@@ -73,36 +70,43 @@ getPossibleValues i values
     | count i values == 0 = [i] ++ getPossibleValues (i + 1) values
     | otherwise = getPossibleValues (i + 1) values
 
+-- Escolhe um valor aleatório na lista
+choice :: [Int] -> Int
+choice l = l !! rand where
+  n = length l
+  (rand, _) = randomR (0, (n - 1)) (mkStdGen 0)
+
 -- Insere vários valores na célula até que a inserção deixe a célula válida
 insertValues :: Int -> [Int] -> Region -> Puzzle -> (Puzzle, Bool)
--- insertValues _ [] _ puzzle = (puzzle, False)
-insertValues i (a:b) region (size, cells) = do
+insertValues _ [] _ puzzle = (puzzle, False)
+insertValues i l region (size, cells) = do
 
-    let newPuzzle = setCellValue i a (size, cells)
+    let newPuzzle = setCellValue i (choice l) (size, cells)
 
     if checkCell (i `mod` size) (i `div` size) region newPuzzle then
         (newPuzzle, True)
     else
-        if length b > 0 then
-            insertValues i b region (size, cells)
+        insertValues i l region newPuzzle
+
+-- Faz o backtracking em células
+cellBacktrackingAux :: Int -> [Int] -> [Region] -> Puzzle -> Puzzle
+cellBacktrackingAux i freeCells regions (size, cells) = do
+
+    let cI = (freeCells!!i)
+    let region = regions!!((getCellRegion (getCell cI (size, cells))) - 1)
+    let insertion = insertValues cI (getPossibleValues 0 (getValuesInRegion region (size, cells))) region (size, cells)
+    let newPuzzle = fst insertion
+    let validInsertion = snd insertion
+
+    if i < size^2 then
+
+        if validInsertion then
+            cellBacktrackingAux (i + 1) freeCells regions newPuzzle
         else
-            (newPuzzle, False)
-
---
-cellBacktracking :: Int -> [Int] -> [Region] -> Puzzle -> Puzzle
-cellBacktracking i freeCells regions (size, cells) = do
-
-    let region = regions!!((getCellRegion (getCell i (size, cells))) - 1)
-    let insertion = insertValues i (getPossibleValues (fst region) (getValuesInRegion region (size, cells))) region (size, cells)
-
-    if i < size then
-
-        if snd insertion then
-            cellBacktracking (i + 1) freeCells regions (fst insertion)
-        else
-            cellBacktracking (i - 1) freeCells regions (fst insertion)
+            cellBacktrackingAux (i - 1) freeCells regions newPuzzle
     else
         (size, cells)
+
 
 -- -- Cria lista de permutacoes para os valores possiveis de uma regiao
 -- getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
@@ -135,14 +139,15 @@ cellBacktracking i freeCells regions (size, cells) = do
 -- insertValue :: Int -> [Int] -> Puzzle -> Puzzle
 -- insertValue _ [] puzzle = puzzle
 -- insertValue i l = (\l g -> l !! fst (randomR (0, length l) g))
--- Cria lista de permutacoes para os valores possiveis de uma regiao
+
+-- Cria lista de permutações para os valores possíveis de uma região
 getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
 getPossibleValuesPermutation (n, []) _ = []
 getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
 
--- Testa se todos os valores, apos insercao, sao validos
+-- Testa se todos os valores, após inserção, são validos
 testingRegion :: Region -> Puzzle -> Int -> Bool
 testingRegion (n,coords) (puzSize,cellList) iter
     | (iter == length coords) = True
@@ -195,6 +200,9 @@ backtracking regIndex p =
 -- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
 
 -- Resolve ---------------------------------------------------------------------
+-- Resolve o puzzle com backtracking sobre células
+cellBacktracking :: Puzzle -> Puzzle
+cellBacktracking puzzle = cellBacktrackingAux 0 (getFreeCells puzzle) (getRegions puzzle) puzzle
 
 --------------------------------------------------------------------------------
 {-
