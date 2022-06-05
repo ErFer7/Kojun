@@ -14,11 +14,12 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(checkCell, getPossibleValues, cellBacktracking, insertValues, testingRegion, backtracking, checkRegionRepetition) where
+module Solver(cellBacktracking) where
+
+-- import Data.List (permutations)
+import System.Random
 
 import Structure
-import Data.List (permutations)
-import System.Random
 
 -- Auxiliares ------------------------------------------------------------------
 -- Conta quantas vezes um valor aparece na lista
@@ -27,6 +28,13 @@ count v [] = 0
 count v (a:b)
     | a == v = 1 + count v b
     | otherwise = count v b
+
+-- Remove um elemento da lista
+removeN :: Int -> [Int] -> [Int]
+removeN _ [] = []
+removeN n (a:b)
+    | n /= a = [a] ++ removeN n b
+    | otherwise = removeN n b
 
 -- Checa se um valor não se repete na região (Exceto 0)
 checkRegionRepetition :: [Int] -> Bool
@@ -48,12 +56,12 @@ checkOrthogonalDifference x y puzzle =
     (x + 1 >= fst puzzle || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x + 1) y puzzle)) &&
     (x - 1 < 0 || getCellValue (getCell2D x y puzzle) /= getCellValue (getCell2D (x - 1) y puzzle))
 
--- Checa se a célula superior é maior que a atual
+-- Checa se a célula inferior é menor que a atual
 checkVerticalGreatness :: Int -> Int -> Puzzle -> Bool
 checkVerticalGreatness x y puzzle =
-    y - 1 < 0 ||
-    getCellValue (getCell2D x y puzzle) < getCellValue (getCell2D x (y - 1) puzzle) ||
-    getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y - 1) puzzle)
+    y + 1 >= fst puzzle ||
+    getCellValue (getCell2D x y puzzle) > getCellValue (getCell2D x (y + 1) puzzle) ||
+    getCellRegion (getCell2D x y puzzle) /= getCellRegion (getCell2D x (y + 1) puzzle)
 
 -- Checa todas as regras para uma célula
 checkCell :: Int -> Int -> Region -> Puzzle -> Bool
@@ -70,153 +78,39 @@ getPossibleValues i values
     | count i values == 0 = [i] ++ getPossibleValues (i + 1) values
     | otherwise = getPossibleValues (i + 1) values
 
--- Escolhe um valor aleatório na lista
-choice :: [Int] -> Int
-choice l = l !! rand where
-  n = length l
-  (rand, _) = randomR (0, (n - 1)) (mkStdGen 0)
+-- Insere vários valores aleatoriamente na célula até que a inserção deixe a célula válida
+insertValues :: Int -> [Int] -> StdGen -> Region -> Puzzle -> (Puzzle, Bool, StdGen)
+insertValues _ [] rng _ puzzle = (puzzle, False, rng)
+insertValues i l rng region (size, cells) = do
 
--- Insere vários valores na célula até que a inserção deixe a célula válida
-insertValues :: Int -> [Int] -> Region -> Puzzle -> (Puzzle, Bool)
-insertValues _ [] _ puzzle = (puzzle, False)
-insertValues i l region (size, cells) = do
-
-    let newPuzzle = setCellValue i (choice l) (size, cells)
+    let (randomIndex, usedRng) = randomR (0, ((length l) - 1)) rng
+    let value = l!!randomIndex
+    let newList = removeN value l
+    let newPuzzle = setCellValue i value (size, cells)
 
     if checkCell (i `mod` size) (i `div` size) region newPuzzle then
-        (newPuzzle, True)
+        (newPuzzle, True, usedRng)
     else
-        insertValues i l region newPuzzle
+        insertValues i newList usedRng region newPuzzle
 
 -- Faz o backtracking em células
-cellBacktrackingAux :: Int -> [Int] -> [Region] -> Puzzle -> Puzzle
-cellBacktrackingAux i freeCells regions (size, cells) = do
+cellBacktrackingAux :: Int -> StdGen -> [Int] -> [Region] -> Puzzle -> Puzzle -> Puzzle
+cellBacktrackingAux i rng freeCells regions (size, cells) originalPuzzle = do
 
-    let cI = (freeCells!!i)
-    let region = regions!!((getCellRegion (getCell cI (size, cells))) - 1)
-    let insertion = insertValues cI (getPossibleValues 0 (getValuesInRegion region (size, cells))) region (size, cells)
-    let newPuzzle = fst insertion
-    let validInsertion = snd insertion
+    let region = regions!!((getCellRegion (getCell (freeCells!!i) (size, cells))) - 1)
+    let possibleValues = getPossibleValues 0 (getValuesInRegion region (size, cells))
+    let (newPuzzle, isValid, usedRng) = insertValues (freeCells!!i) possibleValues rng region (size, cells)
 
-    if i < size^2 then
+    if isValid then
 
-        if validInsertion then
-            cellBacktrackingAux (i + 1) freeCells regions newPuzzle
+        if (i + 1) < (length freeCells) then
+            cellBacktrackingAux (i + 1) usedRng freeCells regions newPuzzle originalPuzzle
         else
-            cellBacktrackingAux (i - 1) freeCells regions newPuzzle
+            newPuzzle
     else
-        (size, cells)
-
-
--- -- Cria lista de permutacoes para os valores possiveis de uma regiao
--- getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
--- getPossibleValuesPermutation (n, []) _ = []
--- getPossibleValuesPermutation r puzzle =
---     permutations values where
---         values = getPossibleValues 1 (getValuesInRegion r puzzle)
---
--- getWorkingPermutation :: Int -> Puzzle -> Int -> [[Int]] -> [Int]
--- getWorkingPermutation region puzzle iter perms =
---     fillRegionWithValues (perms!!iter) (getFreeCellsInRegion (getRegion region puzzle) puzzle)
---
---
--- -- Testa se todos os valores, apos insercao, sao validos
--- testingRegion :: Region -> Puzzle -> Int -> Bool
--- testingRegion (regSize,[a:b]) (puzSize,cellList) iter
---     | (iter == regSize) = True
---     | (checkCell (mod a puzSize) (div a puzSize) == False) = False
---     | otherwise = testingRegion (a,c) puzzle iter
---
--- -- coloca n valores em n celulas
--- fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Bool
--- fillRegionWithValues [] [] _ = False
--- fillRegionWithValues [a,values] [b,coords] puzzle = do
---     setCellValue b a puzzle
---     fillRegionWithValues values coords puzzle
---     return True
-
--- Insere um valor na célula
--- insertValue :: Int -> [Int] -> Puzzle -> Puzzle
--- insertValue _ [] puzzle = puzzle
--- insertValue i l = (\l g -> l !! fst (randomR (0, length l) g))
-
--- Cria lista de permutações para os valores possíveis de uma região
-getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
-getPossibleValuesPermutation (n, []) _ = []
-getPossibleValuesPermutation r puzzle =
-    permutations values where
-        values = getPossibleValues 1 (getValuesInRegion r puzzle)
-
--- Testa se todos os valores, após inserção, são validos
-testingRegion :: Region -> Puzzle -> Int -> Bool
-testingRegion (n,coords) (puzSize,cellList) iter
-    | (iter == length coords) = True
-    | ((checkCell (mod
-        (coords!!iter) puzSize)
-        (div (coords!!iter) puzSize)
-        (n,coords)
-        (puzSize,cellList)) == False) = False
-    | otherwise = (testingRegion (n,coords) (puzSize,cellList) (iter+1))
-
--- coloca n valores em n celulas
-fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Puzzle
-fillRegionWithValues [] [] p = p
-fillRegionWithValues (a:values) (b:coords) puzzle =
-    fillRegionWithValues values coords (setCellValue b a puzzle)
-
-{-
-    metodo backtracking, recebe regiao e puzzle, retorna bool
-    passo 1) preencher uma regiao com valores validos
-    passo 2) checar se valores sao validos
-    passo 3)
-      se valido, backtracking da regiao seguinte
-        se nao houver regiao reguinte, retorna verdadeiro
-      se nao valido, retorna falso
-    passo 4) se retornou falso,
-      se ha mais permutacoes possiveis, volta pro comeco e tenta proxima permutacao
-      de valores validos
-      se nao, retorna falso
--}
--- backtracking :: Int -> Puzzle -> Puzzle
--- backtracking _ p = do
-
--- atualmente, testa uma regiao apenas
-backtracking :: Int -> Puzzle -> Puzzle
-backtracking regIndex p =
-    fillRegionWithValues (
-        getPossibleValues
-            1
-            (getValuesInRegion (getRegion regIndex p) p))
-        (getFreeCellsInRegion (getRegion regIndex p) p)
-        p
-
-
---
--- insertRandomValue :: Int -> [Int] -> Puzzle -> Puzzle
--- insertRandomValue _ [] puzzle = puzzle
--- insertRandomValue i l = (\l g -> l !! fst (randomR (0, length l) g))
-
--- TODO: Função para escolher um valor aleatório em uma lista e inserir no puzzle
--- TODO: Função monad que chama a função de inserção e checa a lista, fazendo o backtracking
+        cellBacktrackingAux 0 usedRng freeCells regions originalPuzzle originalPuzzle
 
 -- Resolve ---------------------------------------------------------------------
 -- Resolve o puzzle com backtracking sobre células
-cellBacktracking :: Puzzle -> Puzzle
-cellBacktracking puzzle = cellBacktrackingAux 0 (getFreeCells puzzle) (getRegions puzzle) puzzle
-
---------------------------------------------------------------------------------
-{-
-getPossibleAt :: Int -> [Int]
-getPossibleAt i =
-    let cell = getCell i
-    if getCellValue cell /= 0 then
-        []
-    else
-        let region = getCellRegion cell
-        removeSubList [1..length region] iterRegionCells regions
-
--- Retorna lista de listas de valores possiveis para cada celula
-getPossibleValues :: Puzzle -> [[Int]]
-getPossibleValues (_,[]) = []
-getPossibleValues (a,b:c) = [getPossibleAt b] ++ getPossibleValues (a,c)
--}
+cellBacktracking :: StdGen -> Puzzle -> Puzzle
+cellBacktracking rng puzzle = cellBacktrackingAux 0 rng (getFreeCells puzzle) (getRegions puzzle) puzzle puzzle
