@@ -93,6 +93,15 @@ insertValues i l rng region (size, cells) = do
     else
         insertValues i newList usedRng region newPuzzle
 
+--
+resetToN :: Int -> Int -> [Int] -> Puzzle -> Puzzle
+resetToN n i freeCells puzzle = do
+
+    if i /= n then
+        resetToN n (i - 1) freeCells (setCellValue (freeCells!!i) 0 puzzle)
+    else
+        setCellValue (freeCells!!i) 0 puzzle
+
 -- Faz o backtracking em células
 cellBacktrackingAux :: Int -> StdGen -> [Int] -> [Region] -> Puzzle -> Puzzle -> Puzzle
 cellBacktrackingAux i rng freeCells regions (size, cells) originalPuzzle = do
@@ -100,15 +109,19 @@ cellBacktrackingAux i rng freeCells regions (size, cells) originalPuzzle = do
     let region = regions!!((getCellRegion (getCell (freeCells!!i) (size, cells))) - 1)
     let possibleValues = getPossibleValues 0 (getValuesInRegion region (size, cells))
     let (newPuzzle, isValid, usedRng) = insertValues (freeCells!!i) possibleValues rng region (size, cells)
+    let resetedToN = resetToN (i - size * 2) ((length freeCells) - 1) freeCells newPuzzle
 
     if isValid then
 
-        if (i + 1) < (length freeCells) then
+        if i + 1 < length freeCells then
             cellBacktrackingAux (i + 1) usedRng freeCells regions newPuzzle originalPuzzle
         else
             newPuzzle
     else
-        cellBacktrackingAux 0 usedRng freeCells regions originalPuzzle originalPuzzle
+        if i - size * 2 >= 0 then
+            cellBacktrackingAux (i - size * 2) usedRng freeCells regions resetedToN originalPuzzle
+        else
+            cellBacktrackingAux 0 usedRng freeCells regions originalPuzzle originalPuzzle
 
 -- Resolve ---------------------------------------------------------------------
 -- Resolve o puzzle com backtracking sobre células

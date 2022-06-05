@@ -1,6 +1,6 @@
 {-  Trabalho 1 de Paradigmas de Programação
     Grupo: Eric e Otávio
-    v0.8
+    v0.8.1
 
     Funcionamento:
     Leitura e montagem do tabuleiro
@@ -26,7 +26,7 @@ main = do
 
     putStr ("----------------\nTrabalho 1\nEric e Otávio\n----------------\n\n")
 
-    testStr <- readFile "Puzzles/Kojun_1.txt"
+    testStr <- readFile "Puzzles/Kojun_12.txt"
 
     let inputInt = inputStrToInt testStr
     let puzzle = buildPuzzle (getSize inputInt) (getRegionList inputInt) (getValueList inputInt)

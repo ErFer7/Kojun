@@ -63,3 +63,9 @@ Trabalho 1 de Paradigmas de Programação
 ## v0.8
 
 * Solver implementado.
+
+---
+
+## v0.8.1
+
+* Pequenas melhorias implementadas.
