@@ -21,11 +21,11 @@ main = do
     let sizeStr = getSizeStr puzzle                                                               -- Tamanho
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
-    putStr (buildPuzzleStr puzzle)
-
+    putStr (buildPuzzleValuesStr puzzle)
+    
     putStr ("Resolvendo o puzzle...\n\n")
 
     let rng = mkStdGen 0  -- Gerador de números pseudo-aleatórios
 
     let solvedPuzzle = cellBacktracking rng puzzle -- Tabuleiro resolvido
-    putStr (buildPuzzleStr solvedPuzzle)           -- Exibe o tabuleiro
+    putStr (buildPuzzleValuesStr solvedPuzzle)     -- Exibe o tabuleiro
