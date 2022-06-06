@@ -14,9 +14,9 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(cellBacktracking) where
+module Solver(cellBacktracking,funcaoTeste) where
 
--- import Data.List (permutations)
+import Data.List (permutations)
 import System.Random
 
 import Structure
@@ -71,7 +71,7 @@ checkCell x y region puzzle =
     checkVerticalGreatness x y puzzle &&
     getCellValue (getCell2D x y puzzle) /= 0
 
--- Obtém os valores possíveis para uma região com base nos valores dela
+-- Obte'm os valores possi'veis para uma região com base nos valores ja' presentes
 getPossibleValues :: Int -> [Int] -> [Int]
 getPossibleValues i values
     | i - 1 >= length values = []
@@ -127,3 +127,43 @@ cellBacktrackingAux i rng freeCells regions (size, cells) originalPuzzle = do
 -- Resolve o puzzle com backtracking sobre células
 cellBacktracking :: StdGen -> Puzzle -> Puzzle
 cellBacktracking rng puzzle = cellBacktrackingAux 0 rng (getFreeCells puzzle) (getRegions puzzle) puzzle puzzle
+
+-- Solucao 2 ----------------------------------------------------------------
+-- Solucao nao aleatoria, baseada em iteracoes sobre permutacoes
+
+-- Cria lista de permutacoes para os valores possiveis de uma regiao
+getPossibleValuesPermutation :: Region -> Puzzle -> [[Int]]
+getPossibleValuesPermutation (n, []) _ = []
+getPossibleValuesPermutation r puzzle =
+    permutations values where
+        values = getPossibleValues 1 (getValuesInRegion r puzzle)
+
+getWorkingPermutation :: Int -> Puzzle -> Int -> [[Int]] -> Puzzle
+getWorkingPermutation region puzzle iter perms =
+    fillRegionWithValues 
+        (perms!!iter) 
+        (getFreeCellsInRegion (getRegion region puzzle) puzzle) 
+        puzzle
+
+
+-- Testa se todos os valores, apos insercao, sao validos
+testingRegion :: Region -> Puzzle -> Int -> Bool
+testingRegion (regSize,(a:b)) (puzSize,cellList) iter
+    | (iter == regSize) = True
+    | ((checkCell (mod a puzSize) (div a puzSize) (regSize,(a:b)) (puzSize,cellList)) == False) = False
+    | otherwise = testingRegion (regSize,(a:b)) (puzSize,cellList) iter
+
+-- coloca n valores em n celulas vazias
+fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Puzzle
+fillRegionWithValues [] [] puzzle = puzzle
+fillRegionWithValues (a:values) (b:coords) puzzle = do
+    let inserted = setCellValue b a puzzle
+    fillRegionWithValues values coords inserted
+
+-- socorro
+funcaoTeste :: Int -> Puzzle -> Puzzle
+funcaoTeste regiaoIndex puzzle = do
+    let regiao = getRegion regiaoIndex puzzle
+    let values = (getPossibleValuesPermutation regiao puzzle)!!0
+    let naught = getFreeCellsInRegion regiao puzzle
+    fillRegionWithValues values naught puzzle

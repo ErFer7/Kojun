@@ -14,7 +14,8 @@ module Structure (Cell,
                   getRegions,
                   getRegionIndexes,
                   getValuesInRegion,
-                  getFreeCells) where
+                  getFreeCells,
+                  getFreeCellsInRegion) where
 
 -- Tipos ----------------------------------------------------------------------
 type Cell = (Int, Int)      -- celula = (região, valor)
@@ -118,3 +119,14 @@ getValuesInRegion (r, (a:b)) puzzle = [getCellValue (getCell a puzzle)] ++ getVa
 -- Obtém uma lista de células livres no tabuleiro inteiro
 getFreeCells :: Puzzle -> [Int]
 getFreeCells puzzle = getFreeCellsAux 0 puzzle
+
+-- funcao auxiliar de obter celulas livres de uma regiao
+getFreeCellsInRegionAux :: [Int] -> Puzzle -> [Int]
+getFreeCellsInRegionAux [] _ = []
+getFreeCellsInRegionAux (a:b) p
+    | (getCellValue (getCell a p) == 0) = [a] ++ getFreeCellsInRegionAux b p
+    | otherwise = getFreeCellsInRegionAux b p
+
+-- Obtem lista de celulas livres na regiao escolhida
+getFreeCellsInRegion :: Region -> Puzzle -> [Int]
+getFreeCellsInRegion (i, coords) p = getFreeCellsInRegionAux coords p

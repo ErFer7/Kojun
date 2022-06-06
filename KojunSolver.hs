@@ -33,11 +33,13 @@ main = do
     let sizeStr = getSizeStr puzzle
 
     putStr ("Tamanho: " ++ sizeStr ++ "x" ++ sizeStr ++ "\n\n")
-    putStr (buildPuzzleStr puzzle)
+    --putStr (buildPuzzleStr puzzle)
+    putStr (buildPuzzleValuesStr puzzle)
 
     putStr ("Resolvendo o puzzle...\n\n")
 
     let rng = mkStdGen 0
 
     let solvedPuzzle = cellBacktracking rng puzzle
-    putStr (buildPuzzleStr solvedPuzzle)
+    putStr (buildPuzzleValuesStr solvedPuzzle)
+
