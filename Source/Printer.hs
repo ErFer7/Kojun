@@ -6,13 +6,13 @@ module Printer (getSizeStr, buildPuzzleStr) where
 import Structure
 
 -- Auxiliares -----------------------------------------------------------------
--- Converte uma célula para um string
+-- Converte uma célula para um string com a formatação ideal
 cellToStr :: Cell -> String
 cellToStr (r, v)
     | r <= 9 = "(0" ++ show r ++ ", " ++ show v ++ ")"
     | otherwise = "(" ++ show r ++ ", " ++ show v ++ ")"
 
--- Constrói um string que representa a puzzle
+-- Constrói um string que representa a puzzle concatenando todas as células
 buildPuzzleStrAux :: Int -> Int -> Puzzle -> String
 buildPuzzleStrAux x y (size, cells)
     | x < size && y < size = cellToStr (getCell2D x y (size, cells)) ++ " " ++ buildPuzzleStrAux (x + 1) y (size, cells)

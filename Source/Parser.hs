@@ -25,10 +25,10 @@ inputStrToInt inputStr = map read (words inputStr) :: [Int]
 getSize :: [Int] -> Int
 getSize inputInt = inputInt!!0
 
--- Obtém uma lista com as regiões
+-- Obtém uma lista com as regiões selecionando as primeiros size^2 elementos da lista e ignorando o primeiro elemento
 getRegionList :: [Int] -> [Int]
 getRegionList inputInt = tail (selectN ((getSize inputInt)^2) inputInt)
 
--- Obtém uma lista com os valores
+-- Obtém uma lista com os valores deletando o primeiro elemento e os próximos size^2 elementos da lista
 getValueList :: [Int] -> [Int]
 getValueList inputInt = deleteN ((getSize inputInt)^2 + 1) inputInt

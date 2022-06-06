@@ -38,13 +38,19 @@ contains v (a:b)
 getRegionIndexesAux :: [Int] -> [Cell] -> [Int]
 getRegionIndexesAux _ [] = []
 getRegionIndexesAux regionIndexes (a:b)
+    -- Se a célula tem uma região já adicionada na lista, ignora
     | contains (getCellRegion a) regionIndexes = getRegionIndexesAux regionIndexes b
+    -- Adiciona a região na lista
     | otherwise = [getCellRegion a] ++ getRegionIndexesAux (regionIndexes ++ [getCellRegion a]) b
 
--- Função auxiliar para a obtenção de uma região
+-- Função auxiliar para a obtenção de uma lista de coordenadas em uma região
 getRegionCellIndexesAux :: Int -> Int -> Puzzle -> [Int]
 getRegionCellIndexesAux r i (size, cells) =
+
+    -- Verifica se o índice já passou do limite
     if i < size^2 then
+
+        -- Se a célula faz parte da região 'r', ela é adicionada na lista
         if getCellRegion (getCell i (size, cells)) == r then
             [i] ++ getRegionCellIndexesAux r (i + 1) (size, cells)
         else
@@ -60,7 +66,11 @@ getRegionsAux (a:b) puzzle = [getRegion a puzzle] ++ getRegionsAux b puzzle
 -- Função auxiliar para encontrar células vazias no puzzle
 getFreeCellsAux :: Int -> Puzzle -> [Int]
 getFreeCellsAux i (size, cells) =
+
+    -- Verifica se o índice já passou do limite
     if i < size^2 then
+
+        -- Se a célula é 0, ela é adicionada na lista
         if getCellValue (getCell i (size, cells)) == 0 then
             [i] ++ getFreeCellsAux (i + 1) (size, cells)
         else
@@ -93,8 +103,8 @@ getCellValue (_, value) = value
 setCellValue :: Int -> Int -> Puzzle -> Puzzle
 setCellValue i v (size, cells) = do
 
-    let splitList = splitAt i cells
-    let (a:b) = snd splitList
+    let splitList = splitAt i cells  -- Tupla com a lista divida
+    let (a:b) = snd splitList        --
 
     (size, (fst splitList) ++ [((getCellRegion (getCell i (size, cells))), v)] ++ b)
 
