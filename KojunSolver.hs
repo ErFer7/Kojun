@@ -36,6 +36,10 @@ main = do
     --putStr (buildPuzzleStr puzzle)
     putStr (buildPuzzleValuesStr puzzle)
 
+    -- mama pi mi mute o, sina lon sewi kon. nimi sina li sewi.
+    --let test = getNextRegionIter 4 puzzle
+    --putStr (buildPuzzleValuesStr test)
+    
     putStr ("Resolvendo o puzzle...\n\n")
 
     let rng = mkStdGen 0

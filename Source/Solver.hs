@@ -14,7 +14,7 @@ Isso melhora a quantidade de solucoes possiveis
 2) Testar possiveis solucoes com algoritmo de backtracking
 -}
 
-module Solver(cellBacktracking,funcaoTeste) where
+module Solver(cellBacktracking,getNextRegionIter) where
 
 import Data.List (permutations)
 import System.Random
@@ -138,20 +138,12 @@ getPossibleValuesPermutation r puzzle =
     permutations values where
         values = getPossibleValues 1 (getValuesInRegion r puzzle)
 
-getWorkingPermutation :: Int -> Puzzle -> Int -> [[Int]] -> Puzzle
-getWorkingPermutation region puzzle iter perms =
-    fillRegionWithValues 
-        (perms!!iter) 
-        (getFreeCellsInRegion (getRegion region puzzle) puzzle) 
-        puzzle
-
-
 -- Testa se todos os valores, apos insercao, sao validos
 testingRegion :: Region -> Puzzle -> Int -> Bool
 testingRegion (regSize,(a:b)) (puzSize,cellList) iter
     | (iter == regSize) = True
-    | ((checkCell (mod a puzSize) (div a puzSize) (regSize,(a:b)) (puzSize,cellList)) == False) = False
-    | otherwise = testingRegion (regSize,(a:b)) (puzSize,cellList) iter
+    | not (checkCell (mod a puzSize) (div a puzSize) (regSize,(a:b)) (puzSize,cellList)) = False
+    | otherwise = testingRegion (regSize,(b)) (puzSize,cellList) (iter+1)
 
 -- coloca n valores em n celulas vazias
 fillRegionWithValues :: [Int] -> [Int] -> Puzzle -> Puzzle
@@ -160,10 +152,30 @@ fillRegionWithValues (a:values) (b:coords) puzzle = do
     let inserted = setCellValue b a puzzle
     fillRegionWithValues values coords inserted
 
--- socorro
-funcaoTeste :: Int -> Puzzle -> Puzzle
-funcaoTeste regiaoIndex puzzle = do
-    let regiao = getRegion regiaoIndex puzzle
-    let values = (getPossibleValuesPermutation regiao puzzle)!!0
-    let naught = getFreeCellsInRegion regiao puzzle
-    fillRegionWithValues values naught puzzle
+-- descobre se uma dada iteracao eh valida
+getWorkingPermutation :: Int -> Puzzle -> Int -> [[Int]] -> Puzzle
+getWorkingPermutation regionIndex puzzle iter perms = do
+    let tested = fillRegionWithValues (perms!!iter) (getFreeCellsInRegion (getRegion regionIndex puzzle) puzzle) puzzle
+    if (testingRegion (getRegion regionIndex puzzle) tested 0) then
+        tested
+    else
+        (-1,[]) -- (-1) = valores invalidos
+
+-- tenta encontrar permutacao valida para uma regiao so que nao funciona
+getNextRegionIterAux :: Int -> Puzzle -> Int -> [[Int]] -> Puzzle
+getNextRegionIterAux regiaoIndex puzzle iter values =
+    if (iter < length values) then do
+        let regiao = getRegion regiaoIndex puzzle
+        let naught = getFreeCellsInRegion regiao puzzle
+        let (a,b) = getWorkingPermutation regiaoIndex puzzle iter values
+        if (a == -1) then
+            getNextRegionIterAux regiaoIndex puzzle (iter+1) values
+        else
+            (a,b)
+    else
+        (-2,[]) -- (-2) = sem iteracoes disponiveis
+
+-- encontra permutacao valida
+getNextRegionIter :: Int -> Puzzle -> Puzzle
+getNextRegionIter regiaoIndex puzzle =
+    getNextRegionIterAux regiaoIndex puzzle 0 (getPossibleValuesPermutation (getRegion regiaoIndex puzzle) puzzle)
