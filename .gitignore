@@ -23,3 +23,5 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 KojunSolver
+/LISP/*.fas
+/LISP/*.lib
