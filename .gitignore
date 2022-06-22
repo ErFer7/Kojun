@@ -25,3 +25,5 @@ cabal.project.local~
 KojunSolver
 /LISP/*.fas
 /LISP/*.lib
+/LISP/Source/*.lib
+/LISP/Source/*.fas
