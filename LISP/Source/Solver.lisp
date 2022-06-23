@@ -1,12 +1,73 @@
 ; solver
 
-(defun count (n lista))
+; conta quantas vezes n aparece na lista
+(defun count (n lista)
+  (if (null lista)
+    0
+    (+
+      (if (= n (car lista))
+        1
+        0
+      )
+      (count n (cdr lista))
+    )
+  )
+)
 
-(defun removeN (n lista))
+; retira n da lista
+(defun removeN (n lista)
+  (if (null lista)
+    ()
+    (cons
+      (if (= n (car lista))
+        ()
+        (n)
+      )
+      (removeN n (cdr lista))
+    )
+  )
+)
 
-(defun checkOrthogonalDifference (pos puzzle))
+(defun checkOrthogonalDifference (pos puzzle)
+  (and
+    (and
+      ;superior
+      (or
+        (= (floor pos puzzle-size) 0)
+        (not (=
+          (getCellValue (getCell (- pos puzzle-size) puzzle))
+        ))
+      )
+      ;inferior
+      (or
+        (= (floor pos puzzle-size) (- puzzle-size 1))
+        (not (getCellValue (getCell (+ pos puzzle-size) puzzle)))
+      )
+    )
+    (and
+      ;esquerda
+      (or
+        (= (mod pos puzzle-size) 0)
+        (not (getCellValue (getCell (- pos 1) puzzle)))
+      )
+      ;direita
+      (or
+        (= (mod pos puzzle-size) (- puzzle-size 1))
+        (not (getCellValue (getCell (+ pos 1) puzzle)))
+      )
+    )
+  )
+)
 
-(defun checkVerticalGreatness (pos puzzle))
+(defun checkVerticalGreatness (pos puzzle)
+  (or
+    (or
+      (= (floor pos puzzle-size) (- puzzle-size 1))
+      ()
+    )
+    ()
+  )
+)
 
 (defun checkCell (pos puzzle)
   (and

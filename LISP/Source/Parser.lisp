@@ -8,7 +8,7 @@
     (when (= n 0) (return lista_r))
     (setq n (- n 1))
     (cons (car lista) lista_r)
-    (setq lista (cdr lista)
+    (setq lista (cdr lista))
   )
 )
 
@@ -16,20 +16,25 @@
   (loop
     (when (= n 0) (return lista))
     (setq n (- n 1))
-    (setq lista (cdr lista)
+    (setq lista (cdr lista))
   )
 )
 
 ;Tratamento de dados
 
-(defun inputStrToInt (str)
-  (dolist (i str)
-    ((loop :for (integer position) := (multiple-value-list
-                                    (parse-integer string
-                                                   :start (or position 0)
-                                                   :junk-allowed t))
-        :while integer
-        :collect integer))
+(defun parse-string-to-float (line)
+  (with-input-from-string (s line)
+    (loop
+      :for num := (read s nil nil)
+      :while num
+      :collect num)))
+
+(defun inputStrToInt (str_list)
+  (if (null str_list) ()
+    (concatenate
+      (parse-string-to-float (car str_list))
+      (inputStrToInt (cdr str_list))
+    )
   )
 )
 
@@ -44,3 +49,9 @@
 (defun getValueList (puzzle)
   (deleteN puzzle (+ (expt (getSize puzzle) 2) 1))
 )
+
+(defun main ()
+  (write-line (inputStrToInt '("1 2 3" "4 5 6" "7 8 9")))
+)
+
+(main)
