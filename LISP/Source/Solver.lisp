@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 ; solver
 
 ; conta quantas vezes n aparece na lista
@@ -85,3 +86,20 @@
 (defun cellBacktrackingAux)
 
 (defun cellBacktracking)
+=======
+; Solver
+; Resolve o puzzle
+
+(defpackage :Solver
+    (:use :common-lisp)
+    (:export :blankFunction))
+
+(in-package :Solver)
+
+#|  Placeholder temporário, esta função é inútil e pode ser deletada assim que
+    necessário
+|#
+(defun blankFunction ()
+    0
+)
+>>>>>>> Stashed changes
