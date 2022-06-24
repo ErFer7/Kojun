@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 ; solver
 
 ; conta quantas vezes n aparece na lista
@@ -86,7 +85,6 @@
 (defun cellBacktrackingAux)
 
 (defun cellBacktracking)
-=======
 ; Solver
 ; Resolve o puzzle
 
@@ -102,4 +100,3 @@
 (defun blankFunction ()
     0
 )
->>>>>>> Stashed changes
