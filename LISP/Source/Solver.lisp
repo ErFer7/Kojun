@@ -76,11 +76,48 @@
   )
 )
 
-(defun getPossibleValues)
+(defun getPossibleValues (i values)
+  (if (>= (- i 1) (length values))
+    ('())
+    (if (= 0 (count i values))
+      (cons (car values) (getPossibleValues (+ i 1) values))
+      (getPossibleValues (+ i 1) values)
+    )
+  )
+)
 
-(defun insertValues)
+; Solucao 1 - Preenchimento aleatorio
+(defun insertValues (puzzle cell_pos)
+  (setq 
+    (cell-value 
+      (nth cell_pos 
+        (puzzle-cells puzzle)))
+    (random
+      (max
+        (getPossibleValues 0
+          (getValuesInRegion 
+            (cell-region 
+              (nth cell_pos 
+                (puzzle-cells puzzle))))))))  ; OMG CLOWN
+  (if (checkCell cell_pos puzzle)
+    (T)
+    (insertValues puzzle cell_pos)
+  )
+)
 
-(defun resetToN)
+(defun resetToN (n i puzzle)
+  (if (= n i)
+    (T)
+    (
+      (setq 
+        (cell-value 
+          (nth cell_pos 
+            (puzzle-cells puzzle)))
+      )
+      (resetToN n (- i 1) puzzle)
+    )
+  )
+)
 
 (defun cellBacktrackingAux)
 

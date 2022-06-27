@@ -38,17 +38,23 @@
   )
 )
 
-(defun getSize (puzzle)
-  (car puzzle)
+(defun getSize (puzzle_list)
+  (car puzzle_list)
 )
 
-(defun getRegionList (puzzle)
-  (selectN (expt (getSize puzzle) 2) (deleteN puzzle 1))
+(defun getRegionList (puzzle_list)
+  (selectN (expt (getSize puzzle_list) 2) (deleteN puzzle_list 1))
 )
 
-(defun getValueList (puzzle)
-  (deleteN puzzle (+ (expt (getSize puzzle) 2) 1))
+(defun getValueList (puzzle_list)
+  (deleteN (+ (expt (getSize puzzle_list) 2) 1) puzzle_list)
 )
+
+(defun readFile (filename) ;thanks Rainer Joswig and Frank Shearar
+  (with-open-file (stream filename)
+    (loop for line = (read-line stream nil)
+          while line
+          collect line)))
 
 (defun main ()
   (write-line (inputStrToInt '("1 2 3" "4 5 6" "7 8 9")))
