@@ -14,5 +14,7 @@
 ; Exibição de dados
 ; TODO: Representar em matriz
 (defun printPuzzle (puzzle)
-    (concatenate (write-to-string (Structure:puzzle-size puzzle)) (write-to-string (Structure:puzzle-cells puzzle)))
+    (concatenate
+        (write-to-string (Structure:puzzle-size puzzle)) (write-to-string (Structure:puzzle-cells puzzle))
+    )
 )

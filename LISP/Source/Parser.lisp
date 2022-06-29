@@ -1,63 +1,78 @@
 ; Parser
 
-;Auxiliares
+(defpackage :Parser
+    (:use :common-lisp)
+    (:export :read-file
+             :input-str-to-float
+             :get-size
+             :get-region-list
+             :get-value-list))
 
-(defun selectN (n lista)
-  (setq lista_r '())
-  (loop
-    (when (= n 0) (return lista_r))
-    (setq n (- n 1))
-    (cons (car lista) lista_r)
-    (setq lista (cdr lista))
-  )
-)
+(in-package :Parser)
 
-(defun deleteN (n lista)
-  (loop
-    (when (= n 0) (return lista))
-    (setq n (- n 1))
-    (setq lista (cdr lista))
-  )
-)
+; A indentação foi modificada de 2 espaços para 4 espaços por motivos ｅｓｔｅｔｉｃｏｓ
 
-;Tratamento de dados
+; Auxiliares ------------------------------------------------------------------
 
-(defun parse-string-to-float (line)
-  (with-input-from-string (s line)
-    (loop
-      :for num := (read s nil nil)
-      :while num
-      :collect num)))
-
-(defun inputStrToInt (str_list)
-  (if (null str_list) ()
-    (concatenate
-      (parse-string-to-float (car str_list))
-      (inputStrToInt (cdr str_list))
+; Seleciona um intervalo (de s a e-1) de números em uma lista.
+(defun select-range (s e float-list)
+    (let (i)
+        (setq i s)
+        (let (ret-list)
+            (setq ret-list '())
+            (loop
+                (when (= i e) (return ret-list))
+                (setq ret-list (append ret-list (list (nth i float-list))))
+                (setq i (+ i 1))
+            )
+        )
     )
-  )
 )
 
-(defun getSize (puzzle_list)
-  (car puzzle_list)
+; Converte um string de floats em uma lista de floats
+(defun parse-string-to-float-list (line)
+    (with-input-from-string (s line)
+        (loop
+        :for num := (read s nil nil)
+        :while num
+        :collect num)))
+
+; Tratamento de dados ---------------------------------------------------------
+
+; Gera uma lista de floats a partir de uma lista de strings
+(defun input-str-to-float (str-list)
+    (when str-list
+        (concatenate 'list
+            (parse-string-to-float-list (car str-list))
+            (input-str-to-float (cdr str-list))
+        )
+    )
 )
 
-(defun getRegionList (puzzle_list)
-  (selectN (expt (getSize puzzle_list) 2) (deleteN puzzle_list 1))
+; Obtém o tamanho do puzzle
+(defun get-size (puzzle-list)
+    (car (select-range 0 1 puzzle-list))
 )
 
-(defun getValueList (puzzle_list)
-  (deleteN (+ (expt (getSize puzzle_list) 2) 1) puzzle_list)
+; Obtém a lista de indices das regiões do puzzle
+(defun get-region-list (puzzle-list)
+    (let (size)
+        (setq size (get-size puzzle-list))
+        (select-range 1 (+ (* size size) 1) puzzle-list)
+    )
 )
 
-(defun readFile (filename) ;thanks Rainer Joswig and Frank Shearar
-  (with-open-file (stream filename)
-    (loop for line = (read-line stream nil)
-          while line
-          collect line)))
-
-(defun main ()
-  (write-line (inputStrToInt '("1 2 3" "4 5 6" "7 8 9")))
+; Obtém a lista de valores do puzzle
+(defun get-value-list (puzzle-list)
+    (let (size)
+        (setq size (get-size puzzle-list))
+        (select-range (+ (* size size) 1) (+ (* 2 (* size size)) 1) puzzle-list)
+    )
 )
 
-(main)
+; Lê um arquivo
+(defun read-file (filename)  ; thanks Rainer Joswig and Frank Shearar
+    (with-open-file (stream filename)
+        (loop for line = (read-line stream nil)
+            while line
+            collect line)))
