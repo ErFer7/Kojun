@@ -1,6 +1,11 @@
 #|  Trabalho 2 de Paradigmas de Programação
     Grupo: Eric e Otávio
-    v0.1
+
+    TODO:
+    [X] Parser
+    [ ] Structure
+    [ ] Printer
+    [ ] Solver
 |#
 
 ;; (require "Structure" "./Source/Structure.lisp")
@@ -18,10 +23,15 @@
 
     ;; (write (write-to-string (Structure:buildPuzzle 10 '(1 2 3) '(1 2 3))))
 
-    (let (str-list)
-        (setq str-list (Parser:read-file "Puzzles/Kojun_1.txt"))
-        (write-line (write-to-string str-list))
-        (write-line (Parser:input-str-to-int str-list))  ; TODO: Arrumar o erro aqui
+    (let (float-list)
+
+        (setq float-list
+            (Parser:input-str-to-float (Parser:read-file "Puzzles/Kojun_1.txt"))
+        )
+
+        (write-line (write-to-string (Parser:get-size float-list)))
+        (write-line (write-to-string (Parser:get-region-list float-list)))
+        (write-line (write-to-string (Parser:get-value-list float-list)))
     )
 )
 
