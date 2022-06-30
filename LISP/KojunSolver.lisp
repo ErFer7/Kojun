@@ -3,9 +3,9 @@
 
     TODO:
     [X] Parser
-    [ ] Structure
-    [ ] Printer
-    [ ] Solver
+    [ ] Structure 2022-06-30
+    [ ] Printer   2022-07-01
+    [ ] Solver    2022-07-02
 |#
 
 ;; (require "Structure" "./Source/Structure.lisp")
