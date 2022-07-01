@@ -3,7 +3,7 @@
 
     TODO:
     [X] Parser
-    [X] Printer   2022-07-30
+    [X] Printer
     [ ] Structure 2022-06-01
     [ ] Solver    2022-07-02
 |#

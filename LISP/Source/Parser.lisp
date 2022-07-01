@@ -13,7 +13,6 @@
 ; A indentação foi modificada de 2 espaços para 4 espaços por motivos ｅｓｔｅｔｉｃｏｓ
 
 ; Auxiliares ------------------------------------------------------------------
-
 ; Seleciona um intervalo (de s a e-1) de números em uma lista.
 (defun select-range (s e float-list)
     (let (i)
@@ -38,7 +37,6 @@
         :collect num)))
 
 ; Tratamento de dados ---------------------------------------------------------
-
 ; Gera uma lista de floats a partir de uma lista de strings
 (defun input-str-to-float (str-list)
     (when str-list

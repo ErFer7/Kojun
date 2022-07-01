@@ -12,7 +12,8 @@
              :puzzle
              :puzzle-size
              :puzzle-cells
-             :build-puzzle))
+             :build-puzzle
+             :get-regions))
 
 (in-package :Structure)
 
@@ -43,31 +44,34 @@
     )
 )
 
-; Funcao auxiliar de pegar regioes
-; (defun getRegion (index regionsList)
-;     (if null regionsList
-;         '()
-; 		(if (= index (region-index (car regionList)))
-; 			(car regionList)
-; 			(getRegion index (cdr regionsList))
-; 		)
-;     )
-; )
-;
-; ; Retorna lista de todas as regioes no puzzle, sla se funciona
-; (defun getRegions (size regionMap)
-; 	(setq regionList '())
-; 	(dotimes i size
-; 		(setq region = (getRegion (nth i regionMap) regionList))
-; 		(if (null region)
-; 			(setq regionList
-; 				(cons (make-region :index (nth i regionMap) :coords '(i)) regionList))
-; 			(setq region
-; 				(cons i (region-coords region)))
-; 		)
-; 		(setq (nth (nth i regionMap) regionList) region)
-; 	)
-; )
+(defun getRegion (index pos regionList)
+    (if (null regionList)
+        '()
+        (if (= index (nth pos regionList))
+            (cons pos (getRegion index (+ pos 1) regionList))
+            (getRegion index (+ pos 1) regionList)
+        )
+    )
+)
+
+(defun getRegionsAux (index pos regionList)
+    (if (>= pos (length regionList))
+        '()
+        (if (> (nth pos regionList) index)
+            (cons
+                (make-region
+                    :index index
+                    :coords (getRegion index pos regionList)
+                )
+                (getRegionsAux (+ index 1) (+ pos 1) regionList))
+            (getRegionsAux index (+ pos 1) regionList)
+        )
+    )
+)
+
+(defun get-regions (regionList)
+    (getRegionsAux 0 0 regionList)
+)
 
 ; Constrói um puzzle com o tamanho, uma lista de regiões e uma lista de valores
 (defun build-puzzle (size region-list value-list)
