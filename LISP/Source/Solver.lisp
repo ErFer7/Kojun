@@ -8,38 +8,10 @@
 (in-package :Solver)
 
 ; Auxiliares ------------------------------------------------------------------
-; conta quantas vezes n aparece na lista
-;; (defun count (n lista)
-;;     (if (null lista)
-;;         0
-;;         (+
-;;           (if (= n (car lista))
-;;             1
-;;             0
-;;           )
-;;           (count n (cdr lista))
-;;         )
-;;     )
-;; )
-
-;; ; retira n da lista
-;; (defun removeN (n lista)
-;;   (if (null lista)
-;;     ()
-;;     (cons
-;;       (if (= n (car lista))
-;;         ()
-;;         (n)
-;;       )
-;;       (removeN n (cdr lista))
-;;     )
-;;   )
-;; )
-
-(defun check-orthogona-difference (pos puzzle)
+(defun check-orthogonal-difference (pos puzzle)
     (and
         (and
-            ;superior
+            ; Superior
             (or
                 (= (floor pos (Structure:puzzle-size puzzle)) 0)
                 (not (= (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle)))
@@ -49,7 +21,7 @@
                      )
                 )
             )
-            ;inferior
+            ; Inferior
             (or
                 (= (floor pos (Structure:puzzle-size puzzle)) (- (Structure:puzzle-size puzzle) 1))
                 (not (= (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle)))
@@ -61,7 +33,7 @@
             )
         )
         (and
-            ;esquerda
+            ; Esquerda
             (or
                 (= (mod pos (Structure:puzzle-size puzzle)) 0)
                 (not (= (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle)))
@@ -71,7 +43,7 @@
                      )
                 )
             )
-            ;direita
+            ; Direita
             (or
                 (= (mod pos (Structure:puzzle-size puzzle)) (- (Structure:puzzle-size puzzle) 1))
                 (not (= (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle)))
@@ -85,22 +57,59 @@
     )
 )
 
-;; (defun check-vertical-greatness (pos puzzle)
-;;     (or
-;;         (or
-;;             (= (floor pos puzzle-size) (- puzzle-size 1))
-;;             ()
-;;             )
-;;         ()
-;;     )
-;; )
+(defun check-vertical-greatness (pos puzzle)
+    (and
+        (or
+            (or (= (floor pos (Structure:puzzle-size puzzle)) (- (Structure:puzzle-size puzzle) 1))
+                (= (Structure:cell-value
+                        (nth (+ pos (Structure:puzzle-size puzzle)) (Structure:puzzle-cells puzzle))
+                   )
+                   0
+                )
+            )
+            (or (< (Structure:cell-value
+                        (nth (+ pos (Structure:puzzle-size puzzle)) (Structure:puzzle-cells puzzle))
+                   )
+                   (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle)))
+                )
+                (not (= (Structure:cell-region
+                            (nth (+ pos (Structure:puzzle-size puzzle)) (Structure:puzzle-cells puzzle))
+                        )
+                        (Structure:cell-region (nth pos (Structure:puzzle-cells puzzle)))
+                     )
+                )
+            )
+        )
+        (or
+            (or (= (floor pos (Structure:puzzle-size puzzle)) 0)
+                (= (Structure:cell-value
+                        (nth (- pos (Structure:puzzle-size puzzle)) (Structure:puzzle-cells puzzle))
+                   )
+                   0
+                )
+            )
+            (or (> (Structure:cell-value
+                        (nth (- pos (Structure:puzzle-size puzzle)) (Structure:puzzle-cells puzzle))
+                   )
+                   (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle)))
+                )
+                (not (= (Structure:cell-region
+                            (nth (- pos (Structure:puzzle-size puzzle)) (Structure:puzzle-cells puzzle))
+                        )
+                        (Structure:cell-region (nth pos (Structure:puzzle-cells puzzle)))
+                     )
+                )
+            )
+        )
+    )
+)
 
-;; (defun checkCell (pos puzzle)
-;;   (and
-;;     (checkOrthogonalDifference pos puzzle)
-;;     (checkVerticalGreatness pos puzzle)
-;;   )
-;; )
+(defun check-cell (pos puzzle)
+    (and
+        (check-orthogonal-difference pos puzzle)
+        (check-vertical-greatness pos puzzle)
+    )
+)
 
 (defun get-possible-values (values)
     (let ((possible-values '()))
@@ -114,52 +123,68 @@
     )
 )
 
-;; ; Solucao 1 - Preenchimento aleatorio
-;; (defun insertValues (puzzle cell_pos)
-;;   (setq 
-;;     (cell-value 
-;;       (nth cell_pos 
-;;         (puzzle-cells puzzle)))
-;;     (random
-;;       (max
-;;         (getPossibleValues 0
-;;           (getValuesInRegion 
-;;             (cell-region 
-;;               (nth cell_pos 
-;;                 (puzzle-cells puzzle))))))))  ; OMG CLOWN
-;;   (if (checkCell cell_pos puzzle)
-;;     (T)
-;;     (insertValues puzzle cell_pos)
-;;   )
-;; )
+(defun insert-values (pos values puzzle)
+    (let ((is-valid NIL) (random-value))
+        (loop
+            (when (or (null values) is-valid) (return (cons is-valid puzzle)))
+            (setq random-value (nth (random (length values)) values))
+            (setq values (remove random-value values))
+            (setf (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle))) random-value)  ; OMG CLOWN (not anymore -_-)
+            (if (check-cell pos puzzle)
+                (setq is-valid T)
+                ()
+            )
+        )
+    )
+)
 
-;; (defun resetToN (n i puzzle)
-;;   (if (= n i)
-;;     (T)
-;;     (
-;;       (setq 
-;;         (cell-value 
-;;           (nth cell_pos 
-;;             (puzzle-cells puzzle)))
-;;       )
-;;       (resetToN n (- i 1) puzzle)
-;;     )
-;;   )
-;; )
+(defun reset-to-n (n i puzzle)
+    (loop
+        (when (= i n) (return puzzle))
+        (if (Structure:cell-is-fixed (nth i (Structure:puzzle-cells puzzle)))
+            ()
+            (setf (Structure:cell-value (nth i (Structure:puzzle-cells puzzle))) 0)
+        )
+        (setq i (- i 1))
+    )
+)
 
 ; Resolução do puzzle ---------------------------------------------------------
 ; Resolve o puzzle com backtracking sobre células
 (defun cell-backtracking (puzzle)
-    (let ((i 0) (region) (region-list (Structure:get-region-list puzzle)))
+    (let ((i 0) (region) (region-list (Structure:get-region-list puzzle)) (insertion '()))
+        (loop
+            (when (= i (* (Structure:puzzle-size puzzle) (Structure:puzzle-size puzzle))) (return puzzle))
 
-        ; Obtém a região atual
-        (setq region (nth (- (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))) 1) region-list))
+            ; Obtém a região atual
+            (setq region (nth (- (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))) 1) region-list))
 
-        ; Obter uma lista de valores possíveis para a célula
-        (get-possible-values (Structure:get-values-in-region region puzzle))
-
-        ;; (write-line (write-to-string (get-possible-values (Structure:get-values-in-region region puzzle))))
-        ;; (write-line (write-to-string (check-orthogona-difference 0 puzzle)))
-        ; Inserir o valor e testar até que seja válido, se for, ret. T, se não, ret. NIL
+            (if (Structure:cell-is-fixed (nth i (Structure:puzzle-cells puzzle)))
+                (setq i (+ i 1))
+                (progn
+                    (setq insertion
+                        (insert-values i (get-possible-values (Structure:get-values-in-region region puzzle)) puzzle)
+                    )
+                    (if (car insertion)
+                        (progn
+                            (setq puzzle (cdr insertion))
+                            (setq i (+ i 1))
+                        )
+                        (progn
+                            (if (>= (- i (* (Structure:puzzle-size puzzle) 3)) 0)
+                                (progn
+                                    (setq puzzle (reset-to-n (- i (* (Structure:puzzle-size puzzle) 3)) i puzzle))
+                                    (setq i (- i (* (Structure:puzzle-size puzzle) 3)))
+                                )
+                                (progn
+                                    (setq puzzle (reset-to-n 0 i puzzle))
+                                    (setq i 0)
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
     )
 )

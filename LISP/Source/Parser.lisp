@@ -10,8 +10,6 @@
 
 (in-package :Parser)
 
-; A indentação foi modificada de 2 espaços para 4 espaços por motivos ｅｓｔｅｔｉｃｏｓ
-
 ; Auxiliares ------------------------------------------------------------------
 ; Seleciona um intervalo (de s a e-1) de números em uma lista.
 (defun select-range (s e float-list)
@@ -28,7 +26,7 @@
 (defun parse-string-to-float-list (line)
     (with-input-from-string (s line)
         (loop
-        :for num := (read s nil nil)
+        :for num := (read s NIL NIL)
         :while num
         :collect num)
     )
@@ -67,7 +65,7 @@
 ; Lê um arquivo
 (defun read-file (filename)  ; thanks Rainer Joswig and Frank Shearar
     (with-open-file (stream filename)
-        (loop for line = (read-line stream nil)
+        (loop for line = (read-line stream NIL)
             while line
             collect line
         )

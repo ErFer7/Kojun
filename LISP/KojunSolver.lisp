@@ -1,11 +1,5 @@
 #|  Trabalho 2 de Paradigmas de Programação
     Grupo: Eric e Otávio
-
-    TODO:
-    [X] Parser
-    [X] Printer
-    [ ] Structure
-    [ ] Solver
 |#
 
 (require "Structure" "./Source/Structure.lisp")
@@ -24,7 +18,7 @@
     (let (puzzle)
         (let (float-list)
             (setq float-list
-                (Parser:input-str-to-float (Parser:read-file "Puzzles/Kojun_1.txt"))
+                (Parser:input-str-to-float (Parser:read-file "Puzzles/Kojun_4.txt"))
             )
 
             (setq puzzle
@@ -47,10 +41,8 @@
             (terpri)
             (write-line "Resolvendo o puzzle...")
 
-            ; (A resolução é chamada aqui)
-
-            ;; (write-line (write-to-string (Structure:get-region-list puzzle)))
-            ;; (write-line (write-to-string (Solver:cell-backtracking puzzle)))
+            (setq puzzle (Solver:cell-backtracking puzzle))
+            (write-line (Printer:print-puzzle puzzle))
 
     )
 )

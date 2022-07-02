@@ -12,6 +12,7 @@
              :puzzle
              :puzzle-size
              :puzzle-cells
+             :make-puzzle
              :build-puzzle
              :get-region-list
              :get-values-in-region))
@@ -38,32 +39,8 @@
     cells
 )
 
-; Auxiliares ------------------------------------------------------------------
-
-; bool - n presente na lista
-; A função nativa member torna essa função obsoleta
-;; (defun contains (n lista)
-;;     (if (null lista)
-;;         NIL
-;;         (if (= n (car lista))
-;;             (T)
-;;             (contains n (cdr lista))
-;;         )
-;;     )
-;; )
-
 ; Construção e acesso ---------------------------------------------------------
-
-;; (defun getRegion (index pos regionList)
-;;     (if (null regionList)
-;;         '()
-;;         (if (= index (nth pos regionList))
-;;             (cons pos (getRegion index (+ pos 1) regionList))
-;;             (getRegion index (+ pos 1) regionList)
-;;         )
-;;     )
-;; )
-
+; Obtém uma lista de regiões
 (defun get-region-list (puzzle)
     (let ((region-index) (region-index-list '()) (region-list '()) (coords '()))
         (dotimes (i (* (Structure:puzzle-size puzzle)
@@ -118,7 +95,7 @@
                             (append cell-list
                                 (list (make-cell :region (nth i region-list)
                                                     :value (nth i value-list)
-                                                    :is-fixed (= 0 (nth i value-list))
+                                                    :is-fixed (/= 0 (nth i value-list))
                                         )
                                 )
                             )
