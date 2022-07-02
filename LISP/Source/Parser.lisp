@@ -15,15 +15,11 @@
 ; Auxiliares ------------------------------------------------------------------
 ; Seleciona um intervalo (de s a e-1) de números em uma lista.
 (defun select-range (s e float-list)
-    (let (i)
-        (setq i s)
-        (let (ret-list)
-            (setq ret-list '())
-            (loop
-                (when (= i e) (return ret-list))
-                (setq ret-list (append ret-list (list (nth i float-list))))
-                (setq i (+ i 1))
-            )
+    (let ((i s) (ret-list '()))
+        (loop
+            (when (= i e) (return ret-list))
+            (setq ret-list (append ret-list (list (nth i float-list))))
+            (setq i (+ i 1))
         )
     )
 )
@@ -34,7 +30,9 @@
         (loop
         :for num := (read s nil nil)
         :while num
-        :collect num)))
+        :collect num)
+    )
+)
 
 ; Tratamento de dados ---------------------------------------------------------
 ; Gera uma lista de floats a partir de uma lista de strings
@@ -54,16 +52,14 @@
 
 ; Obtém a lista de indices das regiões do puzzle
 (defun get-region-list (puzzle-list)
-    (let (size)
-        (setq size (get-size puzzle-list))
+    (let ((size (get-size puzzle-list)))
         (select-range 1 (+ (* size size) 1) puzzle-list)
     )
 )
 
 ; Obtém a lista de valores do puzzle
 (defun get-value-list (puzzle-list)
-    (let (size)
-        (setq size (get-size puzzle-list))
+    (let ((size (get-size puzzle-list)))
         (select-range (+ (* size size) 1) (+ (* 2 (* size size)) 1) puzzle-list)
     )
 )
@@ -73,4 +69,7 @@
     (with-open-file (stream filename)
         (loop for line = (read-line stream nil)
             while line
-            collect line)))
+            collect line
+        )
+    )
+)

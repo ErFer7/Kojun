@@ -1,6 +1,5 @@
 {-  Trabalho 1 de Paradigmas de Programação
     Grupo: Eric e Otávio
-    v1.0
 -}
 
 import System.Random

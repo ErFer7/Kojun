@@ -4,14 +4,14 @@
     TODO:
     [X] Parser
     [X] Printer
-    [ ] Structure 2022-06-01
-    [ ] Solver    2022-07-02
+    [ ] Structure
+    [ ] Solver
 |#
 
 (require "Structure" "./Source/Structure.lisp")
 (require "Parser" "./Source/Parser.lisp")
 (require "Printer" "./Source/Printer.lisp")
-;; (require "Solver" "./Source/Solver.lisp")
+(require "Solver" "./Source/Solver.lisp")
 
 (defun main()
 
@@ -48,6 +48,10 @@
             (write-line "Resolvendo o puzzle...")
 
             ; (A resolução é chamada aqui)
+
+            ;; (write-line (write-to-string (Structure:get-region-list puzzle)))
+            ;; (write-line (write-to-string (Solver:cell-backtracking puzzle)))
+
     )
 )
 
