@@ -13,87 +13,117 @@
              :puzzle-size
              :puzzle-cells
              :build-puzzle
-             :get-regions))
+             :get-region-list
+             :get-values-in-region))
 
 (in-package :Structure)
 
+; Estruturas ------------------------------------------------------------------
+; Região (int, list)
 (defstruct region
     index
     coords
 )
 
+; Célula (int, int, bool)
 (defstruct cell
     region
     value
     is-fixed
 )
 
+; Puzzle (int, list)
 (defstruct puzzle
     size
     cells
 )
 
+; Auxiliares ------------------------------------------------------------------
+
 ; bool - n presente na lista
-(defun contains (n lista)
-    (if (null lista)
-        NIL
-        (if (= n (car lista))
-            (T)
-            (contains n (cdr lista))
-        )
-    )
-)
+; A função nativa member torna essa função obsoleta
+;; (defun contains (n lista)
+;;     (if (null lista)
+;;         NIL
+;;         (if (= n (car lista))
+;;             (T)
+;;             (contains n (cdr lista))
+;;         )
+;;     )
+;; )
 
-(defun getRegion (index pos regionList)
-    (if (null regionList)
-        '()
-        (if (= index (nth pos regionList))
-            (cons pos (getRegion index (+ pos 1) regionList))
-            (getRegion index (+ pos 1) regionList)
-        )
-    )
-)
+; Construção e acesso ---------------------------------------------------------
 
-(defun getRegionsAux (index pos regionList)
-    (if (>= pos (length regionList))
-        '()
-        (if (> (nth pos regionList) index)
-            (cons
-                (make-region
-                    :index index
-                    :coords (getRegion index pos regionList)
+;; (defun getRegion (index pos regionList)
+;;     (if (null regionList)
+;;         '()
+;;         (if (= index (nth pos regionList))
+;;             (cons pos (getRegion index (+ pos 1) regionList))
+;;             (getRegion index (+ pos 1) regionList)
+;;         )
+;;     )
+;; )
+
+(defun get-region-list (puzzle)
+    (let ((region-index) (region-index-list '()) (region-list '()) (coords '()))
+        (dotimes (i (* (Structure:puzzle-size puzzle)
+                       (Structure:puzzle-size puzzle)
+                    )
+                 )
+            (if (member (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))) region-index-list)
+                ()
+                (progn
+                    (setq region-index-list
+                        (append region-index-list (list (Structure:cell-region (nth i (Structure:puzzle-cells puzzle)))))
+                    )
+                    (setq region-index (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))))
+                    (dotimes (j (* (Structure:puzzle-size puzzle)
+                                (Structure:puzzle-size puzzle)
+                                )
+                            )
+                        (if (= region-index (Structure:cell-region (nth j (Structure:puzzle-cells puzzle))))
+                            (setq coords (append coords (list j)))
+                            ()
+                        )
+                    )
+                    (setq region-list (append region-list (list (make-region
+                                                                    :index region-index
+                                                                    :coords coords
+                                                                )
+                                                          )
+                                      )
+                    )
+                    (setq coords '())
                 )
-                (getRegionsAux (+ index 1) (+ pos 1) regionList))
-            (getRegionsAux index (+ pos 1) regionList)
+            )
         )
+        region-list
     )
 )
 
-(defun get-regions (regionList)
-    (getRegionsAux 0 0 regionList)
+(defun get-values-in-region (region puzzle)
+    (loop for pos in (region-coords region)
+        collect (cell-value (nth pos (puzzle-cells puzzle)))
+    )
 )
 
 ; Constrói um puzzle com o tamanho, uma lista de regiões e uma lista de valores
 (defun build-puzzle (size region-list value-list)
     (make-puzzle
         :size size
-        :cells (let (i)
-                    (setq i 0)
-                    (let (cell-list)
-                        (setq cell-list '())
-                        (loop
-                            (when (= i (* size size)) (return cell-list))
-                            (setq cell-list
-                                (append cell-list
-                                    (list (make-cell :region (nth i region-list)
-                                                     :value (nth i value-list)
-                                                     :is-fixed (= 0 (nth i value-list))
-                                          )
-                                    )
+        :cells (let ((i 0) (cell-list '()))
+                    (loop
+                        (when (= i (* size size)) (return cell-list))
+                        (setq cell-list
+                            (append cell-list
+                                (list (make-cell :region (nth i region-list)
+                                                    :value (nth i value-list)
+                                                    :is-fixed (= 0 (nth i value-list))
+                                        )
                                 )
                             )
-                            (setq i (+ i 1))
                         )
+                        (setq i (+ i 1))
                     )
                 )
     )
