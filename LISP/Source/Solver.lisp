@@ -188,7 +188,14 @@
 ; Resolução do puzzle ---------------------------------------------------------
 ; Resolve o puzzle com backtracking sobre regiões
 (defun region-backtracking (puzzle)
-    (let ((r 0) (region) (region-list (Structure:get-region-list puzzle)) (insertion '()) (jump-offset 1))
+    (let ((r 0)
+          (region)
+          (region-list (Structure:get-region-list puzzle))
+          (insertion '())
+          (jump-offset 1)
+          (jump-region 1)
+          (error-count 0)
+         )
         (loop
             (when (> r (- (Structure:region-index (nth (- (length region-list) 1) region-list)) 1)) (return puzzle))
 
@@ -208,25 +215,54 @@
                     (setq puzzle (cdr insertion))
                     (setq r (+ r 1))
                 )
-                (if (> (- r jump-offset) 0)
-                    (progn
-                        (loop
-                            (when (= r 0) (return puzzle))
-                            (setq r (- r 1))
-                            (setq region (nth r region-list))
-                            (setq puzzle (reset-at-positions (Structure:region-coords region) puzzle))
+                (progn
+                    (setq error-count (+ error-count 1))
+                    (if (> error-count 4)
+                        (progn
+                            (setq jump-offset (+ jump-offset 1))
+                            (setq error-count 0)
                         )
+                        ()
                     )
-                    (progn
-                        (loop
-                            (when (= r (- r jump-offset)) (return puzzle))
-                            (setq r (- r 1))
-                            (setq region (nth r region-list))
-                            (setq puzzle (reset-at-positions (Structure:region-coords region) puzzle))
+                    (if (>= (- r jump-offset) 0)
+                        (progn
+                            (setq jump-region (- r jump-offset))
+                            (loop
+                                (setq r (- r 1))
+                                (if (>= r jump-region)
+                                    (progn
+                                        (setq region (nth r region-list))
+                                        (setq puzzle (reset-at-positions (Structure:region-coords region) puzzle))
+                                    )
+                                    (progn
+                                        (setq r jump-region)
+                                        (return puzzle)
+                                    )
+                                )
+                            )
+                        )
+                        (progn
+                            (loop
+                                (setq r (- r 1))
+                                (if (>= r 0)
+                                    (progn
+                                        (setq region (nth r region-list))
+                                        (setq puzzle (reset-at-positions (Structure:region-coords region) puzzle))
+                                    )
+                                    (progn
+                                        (setq r 0)
+                                        (return puzzle)
+                                    )
+                                )
+                            )
                         )
                     )
                 )
             )
+
+            (write-line (Printer:print-puzzle puzzle))
+            (sleep 0.03)
+            (screen:clear-window (screen:make-window))
         )
     )
 )
