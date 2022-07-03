@@ -1,4 +1,5 @@
 ; Structure
+; Definições de estruturas
 
 (defpackage :Structure
     (:use :common-lisp)
@@ -43,17 +44,23 @@
 ; Obtém uma lista de regiões
 (defun get-region-list (puzzle)
     (let ((region-index) (region-index-list '()) (region-list '()) (coords '()))
+        ; Itera pelo puzzle inteiro
         (dotimes (i (* (Structure:puzzle-size puzzle)
                        (Structure:puzzle-size puzzle)
                     )
                  )
+            ; Caso a região já tenha sido encontrada
             (if (member (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))) region-index-list)
                 ()
+                ; Adiciona a nova região na lista
                 (progn
-                    (setq region-index-list
-                        (append region-index-list (list (Structure:cell-region (nth i (Structure:puzzle-cells puzzle)))))
-                    )
+                    ; Define o índice da região
                     (setq region-index (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))))
+                    ; Adiciona o índice na lista de índices de regiões
+                    (setq region-index-list
+                        (append region-index-list (list region-index))
+                    )
+                    ; Procura por todos as células da região e adiciona as posições na lista de coordenadas
                     (dotimes (j (* (Structure:puzzle-size puzzle)
                                 (Structure:puzzle-size puzzle)
                                 )
@@ -63,6 +70,7 @@
                             ()
                         )
                     )
+                    ; Constrói a região
                     (setq region-list (append region-list (list (make-region
                                                                     :index region-index
                                                                     :coords coords
@@ -70,7 +78,7 @@
                                                           )
                                       )
                     )
-                    (setq coords '())
+                    (setq coords '())  ; Reseta as coordenadas
                 )
             )
         )
@@ -78,7 +86,9 @@
     )
 )
 
+; Obtém os valores em uma região
 (defun get-values-in-region (region puzzle)
+    ; Itera pelas coordenadas e constrói uma lista com os valores encontrados
     (loop for pos in (region-coords region)
         collect (cell-value (nth pos (puzzle-cells puzzle)))
     )
@@ -88,15 +98,17 @@
 (defun build-puzzle (size region-list value-list)
     (make-puzzle
         :size size
+        ; Constrói uma lista de células
         :cells (let ((i 0) (cell-list '()))
                     (loop
                         (when (= i (* size size)) (return cell-list))
                         (setq cell-list
                             (append cell-list
+                                ; Constrói uma célula
                                 (list (make-cell :region (nth i region-list)
-                                                    :value (nth i value-list)
-                                                    :is-fixed (/= 0 (nth i value-list))
-                                        )
+                                                 :value (nth i value-list)
+                                                 :is-fixed (/= 0 (nth i value-list))
+                                      )
                                 )
                             )
                         )

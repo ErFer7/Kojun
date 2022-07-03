@@ -17,10 +17,12 @@
 
     (let (puzzle)
         (let (float-list)
+            ; Lê o arquivo
             (setq float-list
                 (Parser:input-str-to-float (Parser:read-file "Puzzles/Kojun_12.txt"))
             )
 
+            ; Constrói o puzzle
             (setq puzzle
                 (Structure:build-puzzle (Parser:get-size float-list)
                                         (Parser:get-region-list float-list)
@@ -41,6 +43,7 @@
             (terpri)
             (write-line "Resolvendo o puzzle...")
 
+            ; Resolve o puzzle
             (Solver:region-backtracking puzzle)
             (write-line (Printer:print-puzzle puzzle))
 
