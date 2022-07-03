@@ -3,7 +3,7 @@
 
 (defpackage :Solver
     (:use :common-lisp)
-    (:export :cell-backtracking))
+    (:export :region-backtracking))
 
 (in-package :Solver)
 
@@ -123,64 +123,106 @@
     )
 )
 
-(defun insert-values (pos values puzzle)
-    (let ((is-valid NIL) (random-value))
+(defun all-permutations (l)
+(cond ((null l) nil)
+        ((null (cdr l)) (list l))
+        (t (loop for element in l
+            append (mapcar (lambda (l) (cons element l))
+                            (all-permutations (remove element l)
+                           )
+                   )
+           )
+        )
+    )
+)
+
+(defun insert-value-list (coords values puzzle)
+    (let ((is-valid NIL) (random-permutation))
         (loop
             (when (or (null values) is-valid) (return (cons is-valid puzzle)))
-            (setq random-value (nth (random (length values)) values))
-            (setq values (remove random-value values))
-            (setf (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle))) random-value)  ; OMG CLOWN (not anymore -_-)
-            (if (check-cell pos puzzle)
-                (setq is-valid T)
-                ()
+            (setq random-permutation (nth (random (length values)) values))
+            (setq values (remove random-permutation values))
+            (let ((i 0))
+                (loop
+                    (when (>= i (length coords)) (return coords))
+                    (if (Structure:cell-is-fixed (nth (nth i coords) (Structure:puzzle-cells puzzle)))
+                        (setq coords (remove (nth i coords) coords))
+                        (setq i (+ i 1))
+                    )
+                )
+            )
+            (dotimes (i (length coords))
+                (if (Structure:cell-is-fixed (nth (nth i coords) (Structure:puzzle-cells puzzle)))
+                    ()
+                    (progn
+                        (setf (Structure:cell-value (nth (nth i coords) (Structure:puzzle-cells puzzle)))
+                              (nth i random-permutation)
+                        )
+                        (if (check-cell (nth i coords) puzzle)
+                            (setq is-valid T)
+                            (setq is-valid NIL)
+                        )
+                        (when
+                            (null is-valid)
+                            (return
+                                (setq puzzle (reset-at-positions coords puzzle))
+                            )
+                        )
+                    )
+                )
             )
         )
     )
 )
 
-(defun reset-to-n (n i puzzle)
-    (loop
-        (when (= i n) (return puzzle))
-        (if (Structure:cell-is-fixed (nth i (Structure:puzzle-cells puzzle)))
-            ()
-            (setf (Structure:cell-value (nth i (Structure:puzzle-cells puzzle))) 0)
-        )
-        (setq i (- i 1))
+(defun reset-at-positions (coords puzzle)
+    (loop for pos in coords
+        do (if (Structure:cell-is-fixed (nth pos (Structure:puzzle-cells puzzle)))
+                ()
+                (setf (Structure:cell-value (nth pos (Structure:puzzle-cells puzzle))) 0)
+           )
     )
+    puzzle
 )
 
 ; Resolução do puzzle ---------------------------------------------------------
-; Resolve o puzzle com backtracking sobre células
-(defun cell-backtracking (puzzle)
-    (let ((i 0) (region) (region-list (Structure:get-region-list puzzle)) (insertion '()))
+; Resolve o puzzle com backtracking sobre regiões
+(defun region-backtracking (puzzle)
+    (let ((r 0) (region) (region-list (Structure:get-region-list puzzle)) (insertion '()) (jump-offset 1))
         (loop
-            (when (= i (* (Structure:puzzle-size puzzle) (Structure:puzzle-size puzzle))) (return puzzle))
+            (when (> r (- (Structure:region-index (nth (- (length region-list) 1) region-list)) 1)) (return puzzle))
 
             ; Obtém a região atual
-            (setq region (nth (- (Structure:cell-region (nth i (Structure:puzzle-cells puzzle))) 1) region-list))
+            (setq region (nth r region-list))
 
-            (if (Structure:cell-is-fixed (nth i (Structure:puzzle-cells puzzle)))
-                (setq i (+ i 1))
+            (setq insertion
+                (insert-value-list
+                    (Structure:region-coords region)
+                    (all-permutations (get-possible-values (Structure:get-values-in-region region puzzle)))
+                    puzzle
+                )
+            )
+
+            (if (car insertion)
                 (progn
-                    (setq insertion
-                        (insert-values i (get-possible-values (Structure:get-values-in-region region puzzle)) puzzle)
-                    )
-                    (if (car insertion)
-                        (progn
-                            (setq puzzle (cdr insertion))
-                            (setq i (+ i 1))
+                    (setq puzzle (cdr insertion))
+                    (setq r (+ r 1))
+                )
+                (if (> (- r jump-offset) 0)
+                    (progn
+                        (loop
+                            (when (= r 0) (return puzzle))
+                            (setq r (- r 1))
+                            (setq region (nth r region-list))
+                            (setq puzzle (reset-at-positions (Structure:region-coords region) puzzle))
                         )
-                        (progn
-                            (if (>= (- i (* (Structure:puzzle-size puzzle) 3)) 0)
-                                (progn
-                                    (setq puzzle (reset-to-n (- i (* (Structure:puzzle-size puzzle) 3)) i puzzle))
-                                    (setq i (- i (* (Structure:puzzle-size puzzle) 3)))
-                                )
-                                (progn
-                                    (setq puzzle (reset-to-n 0 i puzzle))
-                                    (setq i 0)
-                                )
-                            )
+                    )
+                    (progn
+                        (loop
+                            (when (= r (- r jump-offset)) (return puzzle))
+                            (setq r (- r 1))
+                            (setq region (nth r region-list))
+                            (setq puzzle (reset-at-positions (Structure:region-coords region) puzzle))
                         )
                     )
                 )

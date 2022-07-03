@@ -12,7 +12,7 @@
              :puzzle
              :puzzle-size
              :puzzle-cells
-             :make-puzzle
+             :copy-puzzle
              :build-puzzle
              :get-region-list
              :get-values-in-region))

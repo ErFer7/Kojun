@@ -18,7 +18,7 @@
     (let (puzzle)
         (let (float-list)
             (setq float-list
-                (Parser:input-str-to-float (Parser:read-file "Puzzles/Kojun_4.txt"))
+                (Parser:input-str-to-float (Parser:read-file "Puzzles/Kojun_12.txt"))
             )
 
             (setq puzzle
@@ -41,7 +41,7 @@
             (terpri)
             (write-line "Resolvendo o puzzle...")
 
-            (setq puzzle (Solver:cell-backtracking puzzle))
+            (Solver:region-backtracking puzzle)
             (write-line (Printer:print-puzzle puzzle))
 
     )
