@@ -259,10 +259,6 @@
                     )
                 )
             )
-
-            (write-line (Printer:print-puzzle puzzle))
-            (sleep 0.03)
-            (screen:clear-window (screen:make-window))
         )
     )
 )
