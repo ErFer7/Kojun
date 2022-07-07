@@ -1,22 +1,22 @@
 % Parser
 % Leitura e processamento de dados
 
-% :- module(parser, [my_read_file/3]).
+:- module(parser, [read_file/2]).
 
-% read_file(File, Firt_Number, StrList) :-
-%     open(File, read, Stream),
-%     read_line(Stream, [Firt_Number]),
-%     read_line(Stream, List),
-%     close(Stream).
+% Leitura da estrutura --------------------------------------------------------
+% Lê um arquivo
+read_file(File, L) :-
+    setup_call_cleanup(
+        open(File, read, In),
+        read_stream(In, L),
+        close(In)
+    ).
 
-% my_read_file(File,Firt_Number ,List):-
-%     open(File, read, Stream),
-%     read_line(Stream, [Firt_Number]),
-%     read_line(Stream, List),
-%     close(Stream).
-
-% read_line(Stream, List) :-
-%     read_line_to_codes(Stream, Line),
-%     atom_codes(A, Line),
-%     atomic_list_concat(As, ' ', A),
-%     maplist(atom_number, As, List).
+% Lê uma stream de caracteres e constrói a estrutura
+read_stream(In, L) :-
+    read_term(In, H, []),
+    (   H == end_of_file
+    ->  L = []
+    ;   L = [H|T],
+        read_stream(In, T)
+    ).
