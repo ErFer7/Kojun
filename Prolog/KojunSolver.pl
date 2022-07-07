@@ -1,3 +1,13 @@
-main :- write('This is sample Prolog program'),
-write(' This program is written into KojunSolver.pl file').
-main.
+/*  Trabalho 3 de Paradigmas de Programação
+    Grupo: Eric e Otávio
+*/
+
+% Carrega todos os arquivos com o código fonte
+load_files :- ['Source/Structure'],
+              ['Source/Parser'],
+              ['Source/Printer'],
+              ['Source/Solver'].
+
+main :- load_files,
+        write('----------------\nTrabalho 3\nEric e Otavio\n----------------'),
+        halt.
