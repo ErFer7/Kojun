@@ -3,11 +3,15 @@
 */
 
 % Carrega todos os arquivos com o código fonte
-load_files :- ['Source/Structure'],
-              ['Source/Parser'],
-              ['Source/Printer'],
-              ['Source/Solver'].
+load_files :-
+    ['Source/Structure'],
+    ['Source/Parser'],
+    ['Source/Printer'],
+    ['Source/Solver'].
 
-main :- load_files,
-        write('----------------\nTrabalho 3\nEric e Otavio\n----------------'),
-        halt.
+main :-
+    load_files,
+    write('----------------\nTrabalho 3\nEric e Otavio\n----------------'),
+    % use_module(parser),
+    % my_read_file('Puzzles/Kojun_12.txt'),
+    halt.
