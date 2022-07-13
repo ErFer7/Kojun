@@ -11,11 +11,13 @@ main :-
     write('----------------\nTrabalho 3\nEric e Otavio\n----------------'),
     read_file('Puzzles/Kojun_12.txt', List),
     % Testes
-    nth0(5, List, Sublist),
-    write('\n'),
+    write(List),
+    write('\n\n'),
+    nth0(0, List, Sublist),
+    write('\n\n'),
     write(Sublist),
-    nth0(5, Sublist, Elem),
-    write('\n'),
+    nth0(0, Sublist, Elem),
+    write('\n\n'),
     write(Elem),
-    write('\n'),
+    write('\n\n'),
     halt.
