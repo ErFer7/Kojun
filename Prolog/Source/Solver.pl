@@ -1,7 +1,7 @@
 % Solver
 % Resolve o puzzle
 
-
+:- module(solver, [solved_puzzle/2]).
 % funcoes para evitar repeticoes [valor,regiao]
 
 % encontra duplicatas em lista
@@ -65,7 +65,7 @@ orthogonalDifference(M):- directionDif(M),
 
 % acha solucao com todas as condicoes acima validas
 
-solvedPuzzle(P):- allUnique(P),
+solved_puzzle(P):- allUnique(P),
                   verticalGreatness(P),
                   allBelowN(P),
                   orthogonalDifference(P).
