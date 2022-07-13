@@ -4,20 +4,32 @@
 
 % funcoes para evitar repeticoes [valor,regiao]
 
-% concatena lista de listas
-concatAll([L1,L2],R):- concatenate(L1,L2,R)!.
-concatAll([L|T],R):- R1 is concatAll(T,R1), concatenate(T,R1,R).
-
 % encontra duplicatas em lista
-not findDupes(_,[])!.
-findDupes(X,[H|T]):- contains(H,T); findDupes(T).
-
-% encontra se elemento esta na lista
-not contains(_,[])!.
-contains(X,[H|T]):- X==H; contains(X,T).
+not findDupes([_])!.
+findDupes([H|T]):- member(H,T);
+                   findDupes(T).
 
 % verifica se cada elemento eh unico
-allUnique(M):- line_matrix is concatAll(M,line_matrix), not findDupes(line_matrix)
+allUnique(M):- line_matrix is flatten(M,line_matrix),
+               not findDupes(line_matrix).
+
+
+% funcoes para manter valores entre 1 e N
+
+% conta elementos em regiao
+elemsInRegion(R,[],C):- C is 0!.
+elemsInRegion(R,[[V,R]|T],C):- C1 is elemsInRegion(R,T,C1), C is C1+1.
+elemsInRegion(R,[H|T],C):- C is elemsInRegion(R1,T,C).
+
+% verifica se todos estao em 1:N em uma regiao
+allOneThroughN([],L).
+allOneThroughN([[V1,R1]|T],L):- C is elemsInRegion(R1,L,C),
+                                V1 <= C,
+                                V1 >= 1,
+                                allOneThroughN(T,L).
+
+% aplica funcao acima a partir de matriz original
+allBelowN(P):- allOneThroughN(flatten(P),flatten(P)).
 
 
 % funcoes para evitar valor maior que a posicao inferior
@@ -43,15 +55,17 @@ checkLine([[V1,_],[V2,R]|T]):- V1=\=V2,checkLine([[V2,R]|T]).
 
 % aplica funcao acima a cada linha
 directionDif([H]):- checkLine(H)!.
-directionDif([H|T]):- checkLine(H), directionDif(T).
+directionDif([H|T]):- checkLine(H),
+                      directionDif(T).
 
 % aplica checagem a original e transposta para checar duas direcoes
-orthogonalDifference(M):- directionDif(M), directionDif(transpose(M)).
+orthogonalDifference(M):- directionDif(M),
+                          directionDif(transpose(M)).
 
 
 % acha solucao com todas as condicoes acima validas
 
 solvedPuzzle(P):- allUnique(P),
                   verticalGreatness(P),
+                  allBelowN(P),
                   orthogonalDifference(P).
-
