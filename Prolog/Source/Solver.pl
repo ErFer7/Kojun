@@ -1,30 +1,30 @@
 % Solver
 % Resolve o puzzle
 
-:- module(solver, [solved_puzzle/2]).
+:- module(solver, [solved_puzzle/1]).
 % funcoes para evitar repeticoes [valor,regiao]
 
 % encontra duplicatas em lista
-not findDupes([_]):-!.
+not(findDupes([_])):-!.
 findDupes([H|T]):- member(H,T);
                    findDupes(T).
 
 % verifica se cada elemento eh unico
 allUnique(M):- line_matrix is flatten(M,line_matrix),
-               not findDupes(line_matrix).
+               not(findDupes(line_matrix)).
 
 
 % funcoes para manter valores entre 1 e N
 
 % conta elementos em regiao
-elemsInRegion(R,[],C):- C is 0,!.
-elemsInRegion(R,[[V,R]|T],C):- C1 is elemsInRegion(R,T,C1), C is C1+1.
-elemsInRegion(R,[H|T],C):- C is elemsInRegion(R1,T,C).
+elemsInRegion(_,[],C):- C is 0,!.
+elemsInRegion(R,[[_,R]|T],C):- C1 is elemsInRegion(R,T,C1), C is C1+1,!.
+elemsInRegion(R,[_|T],C):- C is elemsInRegion(R,T,C).
 
 % verifica se todos estao em 1:N em uma regiao
-allOneThroughN([],L).
+allOneThroughN([],_).
 allOneThroughN([[V1,R1]|T],L):- C is elemsInRegion(R1,L,C),
-                                V1 <= C,
+                                V1 =< C,
                                 V1 >= 1,
                                 allOneThroughN(T,L).
 
@@ -65,7 +65,8 @@ orthogonalDifference(M):- directionDif(M),
 
 % acha solucao com todas as condicoes acima validas
 
-solved_puzzle(P):- allUnique(P),
+solved_puzzle(P):-
+                  allUnique(P),
                   verticalGreatness(P),
                   allBelowN(P),
                   orthogonalDifference(P).
