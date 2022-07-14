@@ -4,14 +4,21 @@
 :- module(solver, [solved_puzzle/1]).
 % funcoes para evitar repeticoes [valor,regiao]
 
+% transforma matriz em lista unidimensional
+
+oneDimentional([H],H):-!.
+oneDimentional([H|T],line_matrix):-
+    line_matrix1 is oneDimentional(T,line_matrix1),
+    line_matrix is concatenate(H,line_matrix1,line_matrix).
+
 % encontra duplicatas em lista
-not(findDupes([_])):-!.
 findDupes([H|T]):- member(H,T);
                    findDupes(T).
 
 % verifica se cada elemento eh unico
-allUnique(M):- line_matrix is flatten(M,line_matrix),
-               not(findDupes(line_matrix)).
+allUnique(M):- line_matrix is oneDimentional(M,line_matrix),
+               dupes is findDupes(line_matrix),
+               not(dupes).
 
 
 % funcoes para manter valores entre 1 e N
@@ -65,8 +72,7 @@ orthogonalDifference(M):- directionDif(M),
 
 % acha solucao com todas as condicoes acima validas
 
-solved_puzzle(P):-
-                  allUnique(P),
+solved_puzzle(P):-allUnique(P),
                   verticalGreatness(P),
                   allBelowN(P),
                   orthogonalDifference(P).
