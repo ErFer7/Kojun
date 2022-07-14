@@ -8,17 +8,16 @@
 
 oneDimentional([H],H):-!.
 oneDimentional([H|T],line_matrix):-
-    line_matrix1 is oneDimentional(T,line_matrix1),
-    line_matrix is concatenate(H,line_matrix1,line_matrix).
+    line_matrix1 = oneDimentional(T,line_matrix1),
+    line_matrix = concatenate(H,line_matrix1,line_matrix).
 
 % encontra duplicatas em lista
 findDupes([H|T]):- member(H,T);
                    findDupes(T).
 
 % verifica se cada elemento eh unico
-allUnique(M):- line_matrix is oneDimentional(M,line_matrix),
-               dupes is findDupes(line_matrix),
-               not(dupes).
+allUnique(M):- line_matrix = oneDimentional(M,line_matrix),
+               not(findDupes(line_matrix)).
 
 
 % funcoes para manter valores entre 1 e N
@@ -76,3 +75,5 @@ solved_puzzle(P):-allUnique(P),
                   verticalGreatness(P),
                   allBelowN(P),
                   orthogonalDifference(P).
+
+% (i (am (starting((to miss) this) now))
