@@ -4,6 +4,7 @@
 :- module(printer, [print_puzzle/1]).
 
 % Exibição de dados -----------------------------------------------------------
+% Exibe o puzzle
 print_puzzle([_]).
 print_puzzle([]).
 print_puzzle([H|T]) :-
@@ -11,6 +12,7 @@ print_puzzle([H|T]) :-
     write('\n'),
     print_puzzle(T).
 
+% Exibe a linha
 print_line([_]).
 print_line([]).
 print_line([H|T]) :-

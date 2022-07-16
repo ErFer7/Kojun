@@ -1,2 +1,2 @@
-KojunSolver: KojunSolver.pl
-	swipl -o KojunSolver -c KojunSolver.pl
+Kojun: KojunSolver.pl
+	swipl -s KojunSolver.pl -g main -t halt

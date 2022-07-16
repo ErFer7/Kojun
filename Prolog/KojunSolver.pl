@@ -15,8 +15,8 @@ main :-
     read_file('Puzzles/Kojun_12.txt', List),
     print_puzzle(List),
 
-    write('\n\nResolvendo puzzle...\n\n'),
+    write('\nResolvendo puzzle...\n\n'),
 
-    solved_puzzle(List),
+    solve(List),
     print_puzzle(List),
     halt.
