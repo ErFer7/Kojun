@@ -7,9 +7,40 @@
 
 % Solução ---------------------------------------------------------------------
 
+vertical_greatness(Puzzle, X, Y) :-
+    %
+    length(Puzzle, Size),
+    % Obtém a célula na posição (x, y)
+    nth0(Y, Puzzle, Line),
+    nth0(X, Line, [V, R]),
+    % Obtém a célula acima
+    (   Y > 0
+        ->  Yup is Y - 1,  % Yup
+        nth0(Yup, Puzzle, LineAbove),
+        nth0(X, LineAbove, [Vup, Rup])
+    ;   Rup = -1
+    ),
+    % Obtém a célula abaixo
+    (   Y < (Size - 1)
+    ->  Ydown is Y + 1,
+        nth0(Ydown, Puzzle, LineUnder),
+        nth0(X, LineUnder, [Vdown, Rdown])
+    ;   Rdown = -1
+    ),
+    % Regras de verificação
+    (   R == Rup
+    ->  V < Vup
+    ;   true
+    ),
+    (   R == Rdown
+    ->  V > Vdown
+    ;   true
+    ).
+
 % Em construção
 solve(Puzzle) :-
-    write(Puzzle).
+    vertical_greatness(Puzzle, 5, 0),
+    true.
 
 % COMENTADO -------------------------------------------------------------------
 
