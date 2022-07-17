@@ -9,6 +9,7 @@
 
 % Em construção
 solve(Puzzle) :-
+    orthogonalDifference(Puzzle),
     write(Puzzle).
 
 % COMENTADO -------------------------------------------------------------------
@@ -34,13 +35,13 @@ solve(Puzzle) :-
 % % funcoes para manter valores entre 1 e N
 
 % % conta elementos em regiao
-% elemsInRegion(_,[],C):- C = 0,!.
-% elemsInRegion(R,[[_,R]|T],C):- C1 = elemsInRegion(R,T,C1), C = C1+1,!.
-% elemsInRegion(R,[_|T],C):- C = elemsInRegion(R,T,C).
+% elemsInRegion(_,[],C):- C = 0.
+% elemsInRegion(R,[[_,R]|T],C):- elemsInRegion(R,T,C1), C = C1+1.
+% elemsInRegion(R,[_|T],C):- elemsInRegion(R,T,C).
 
 % % verifica se todos estao em 1:N em uma regiao
 % allOneThroughN([],_).
-% allOneThroughN([[V1,R1]|T],L):- C = elemsInRegion(R1,L,C),
+% allOneThroughN([[V1,R1]|T],L):- elemsInRegion(R1,L,C),
 %                                 V1 #=< C,
 %                                 V1 #>= 1,
 %                                 allOneThroughN(T,L).
@@ -52,32 +53,79 @@ solve(Puzzle) :-
 % % funcoes para evitar valor maior que a posicao inferior
 
 % % checa se valor de um elemento eh maior q o proximo se for mesma regiao
-% checkColumn([_]):-!.
-% checkColumn([[V1,R],[V2,R]|T]):- V1 #> V2, checkColumn([[V2,R]|T]),!.
+% checkColumn([_]).
+% checkColumn([[V1,R],[V2,R]|T]):- V1 #> V2, checkColumn([[V2,R]|T]).
 % checkColumn([_|T]):- checkColumn([T]).
 
 % % aplica funcao acima a cada coluna
-% vgAux([C]):- checkColumn(C),!.
+% vgAux([C]):- checkColumn(C).
 % vgAux([C|T]):- checkColumn(C), vgAux(T).
 
 % % aplica checagem para a transposta, checando coluna e nao linha
 % verticalGreatness(M):- vgAux(transpose(M)).
 
 
-% % funcoes para checar diferenca entre valores adjacentes
+orthogonal_difference(Puzzle,X,Y) :-
+    length(Puzzle,Size),
+    % Pega celula na posicao (X,Y)
+    nth0(Y,Puzzle,Line),
+    nth0(X,Puzzle,Cell),
+    % Acima
+    ( Y > 0
+    -> Yup = Y - 1,
+    nth0(Yup,Puzzle,LineAbove),
+    nth0(X,LineAbove,[Vup,Rup])
+    ; Vup = -1
+    ),
+    % Abaixo
+    ( Y < (Size - 1)
+    -> Ydown = Y + 1,
+    nth0(Ydown,Puzzle,LineBelow),
+    nth0(X,LineBelow,[Vdown,Rdown])
+    ; Vdown = -1
+    ),
+    % Esquerda
+    ( X > 0
+    -> XLeft = X - 1,
+    nth0(XLeft,Line,[Vleft,Rleft])
+    ; Vleft = -1
+    ),
+    % Direita
+    ( X < (Size - 1),
+    XRight = X + 1,
+    nth0(XRight,Line,[Vright,Rright])
+    ; Vright = -1
+    ),
+    % Regras
+    V \= Vup,
+    V \= Vdown,
+    V \= Vleft,
+    V \= Vright.
 
-% % verifica se valores em uma linha sao diferentes dos vizinhos
-% checkLine([_]):-!.
-% checkLine([[V1,_],[V2,R]|T]):- V1 #\= V2,checkLine([[V2,R]|T]).
+% funcao teste para o tabuleiro inteiro
 
-% % aplica funcao acima a cada linha
-% directionDif([H]):- checkLine(H),!.
-% directionDif([H|T]):- checkLine(H),
-%                       directionDif(T).
 
-% % aplica checagem a original e transposta para checar duas direcoes
-% orthogonalDifference(M):- directionDif(M),
-%                           directionDif(transpose(M)).
+
+orthogonal_loop_y(Puzzle,X,Y):-
+    length(Puzzle,Size),
+    orthogonal_loop_x(Puzzle,X,Y),
+    (Y < (Size - 1)
+    -> Y1 is Y + 1,
+    orthogonal_loop_y(Puzzle,X,Y1)
+    ; true
+    ).
+
+orthogonal_loop_x(Puzzle,X,Y):-
+    length(Puzzle,Size),
+    orthogonal_difference(Puzzle,X,Y),
+    (X < (Size - 1)
+    -> X1 is X + 1,
+    orthogonal_loop_x(Puzzle,X1,Y),
+    ; true
+    ).
+
+orthogonalDifference(Puzzle):- 
+    orthogonal_loop_y(Puzzle,0,0).
 
 
 % % acha solucao com todas as condicoes acima validas
