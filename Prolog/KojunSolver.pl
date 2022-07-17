@@ -12,7 +12,7 @@ main :-
     load_modules,
     write('----------------\nTrabalho 3\nEric e Otavio\n----------------\n\n'),
 
-    read_file('Puzzles/Kojun_12.txt', List),
+    read_file('Puzzles/Kojun_1.txt', List),
     print_puzzle(List),
 
     write('\nResolvendo puzzle...\n\n'),
