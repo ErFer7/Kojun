@@ -1,12 +1,17 @@
-test_list([_, 1, 2, _]).
+prox_diff(List, N) :-
+    nth0(N, List, X),
+    Nb is N - 1,
+    Nn is N + 1,
+    nth0(Nb, List, Y),
+    nth0(Nn, List, Z),
+    X \== Y,
+    X \== Z.
 
-unique(List) :-
-    all_distinct(List).
+left(List, N, X) :-
+    X is nth0(N - 1, List, X).
 
 main :-
     use_module(library(clpfd)),
-    write('TESTE\n\n'),
-
-    unique([_, 1, 2, _]),
-
+    left([1, 2, 3], 1, X),
+    write(X),
     halt.
