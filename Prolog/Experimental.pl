@@ -7,11 +7,8 @@ prox_diff(List, N) :-
     X \== Y,
     X \== Z.
 
-left(List, N, X) :-
-    X is nth0(N - 1, List, X).
-
 main :-
     use_module(library(clpfd)),
-    left([1, 2, 3], 1, X),
-    write(X),
+    prox_diff([1, 2, 3, 4, 5], N),
+    write(N),
     halt.

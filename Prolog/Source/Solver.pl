@@ -88,3 +88,4 @@ solve(Puzzle) :-
 %                   orthogonalDifference(P).
 
 % (i (am (starting((to miss) this) now))
+% msg: .asciiz "I prefer MIPS assembly over Prolog"
