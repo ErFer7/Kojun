@@ -3,15 +3,7 @@
 
 :- module(parser, [read_file/2]).
 
-% Leitura da estrutura --------------------------------------------------------
-% Lê um arquivo
-read_file(File, L) :-
-    setup_call_cleanup(
-        open(File, read, In),
-        read_stream(In, L),
-        close(In)
-    ).
-
+% Auxiliares ------------------------------------------------------------------
 % Lê uma stream de caracteres e constrói a estrutura
 read_stream(In, L) :-
     read_term(In, H, []),
@@ -19,4 +11,13 @@ read_stream(In, L) :-
     ->  L = []
     ;   L = [H|T],
         read_stream(In, T)
+    ).
+
+% Leitura da estrutura --------------------------------------------------------
+% Lê um arquivo
+read_file(File, L) :-
+    setup_call_cleanup(
+        open(File, read, In),
+        read_stream(In, L),
+        close(In)
     ).

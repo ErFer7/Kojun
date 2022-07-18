@@ -5,20 +5,20 @@
 
 :- use_module(library(clpfd)).
 
-% Solução ---------------------------------------------------------------------
-
-% auxiliares de pegar valores
-get_cell_value(Puzzle,X,Y,V):-
-    get_cell(Puzzle,X,Y,[V,_]).
-
-get_cell_region(Puzzle,X,Y,R):-
-    get_cell(Puzzle,X,Y,[_,R]).
-
+% Auxiliares ------------------------------------------------------------------
+% Obtenção de célula
 get_cell(Puzzle,X,Y,[V,R]):-
     nth0(Y, Puzzle, Line),
     nth0(X, Line, [V, R]).
 
-% verifica se dentre uma regiao, uma celula eh maior que a inferior
+% Obtenção de valor
+get_cell_value(Puzzle,X,Y,V):-
+    get_cell(Puzzle,X,Y,[V,_]).
+
+% Obtenção de região
+get_cell_region(Puzzle,X,Y,R):-
+    get_cell(Puzzle,X,Y,[_,R]).
+
 % Planifica uma lista em apenas um nível
 flat([], []).
 flat([H|T], Out) :-
@@ -46,7 +46,7 @@ interval(Puzzle, X, Y):-
     V > 0,
     V =< Size.
 
-% Regra de gradeza vertical
+% verifica se dentre uma região, uma célula é maior que a inferior
 vertical_greatness(Puzzle, X, Y) :-
     % Obtém o tamanho
     length(Puzzle, Size),
@@ -79,8 +79,7 @@ vertical_greatness(Puzzle, X, Y) :-
 % Regra de valor único na região.
 unique(Puzzle, X, Y) :-
     get_cell(Puzzle, X, Y, Cell),
-    % Planifica o puzzle
-    flat(Puzzle, FlatPuzzle),
+    flat(Puzzle, FlatPuzzle),  % Planifica o puzzle
     remove(Cell, FlatPuzzle, CompPuzzle),
     maplist(dif(Cell), CompPuzzle).
 
@@ -119,10 +118,8 @@ orthogonal_difference(Puzzle,X,Y) :-
     V \== Vleft,
     V \== Vright.
 
+% Solução ---------------------------------------------------------------------
 % funcao teste para o tabuleiro inteiro
-
-
-
 orthogonal_loop_y(Puzzle,X,Y):-
     length(Puzzle,Size),
     orthogonal_loop_x(Puzzle,X,Y),
