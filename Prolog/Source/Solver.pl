@@ -90,34 +90,34 @@ orthogonal_difference(Puzzle,X,Y) :-
     % Pega celula na posicao (X,Y)
     get_cell_value(Puzzle,X,Y,V),
     % Acima
-    ( Y > 0
-    -> Yup is Y - 1,
-    get_cell_value(Puzzle,X,Yup,Vup)
-    ; Vup = -1
+    (   Y > 0
+    ->  Yup is Y - 1,
+        get_cell_value(Puzzle,X,Yup,Vup)
+    ;   Vup = -1
     ),
     % Abaixo
-    ( Y < (Size - 1)
-    -> Ydown is Y + 1,
-    get_cell_value(Puzzle,X,Ydown,Vdown)
-    ; Vdown = -1
+    (   Y < (Size - 1)
+    ->  Ydown is Y + 1,
+        get_cell_value(Puzzle,X,Ydown,Vdown)
+    ;   Vdown = -1
     ),
     % Esquerda
-    ( X > 0
-    -> XLeft is X - 1,
-    get_cell_value(Puzzle,XLeft,Y,Vleft)
-    ; Vleft = -1
+    (   X > 0
+    ->  XLeft is X - 1,
+        get_cell_value(Puzzle,XLeft,Y,Vleft)
+    ;   Vleft = -1
     ),
     % Direita
-    ( X < (Size - 1),
-    XRight is X + 1,
-    get_cell_value(Puzzle,XRight,Y,Vright)
-    ; Vright = -1
+    (   X < (Size - 1)
+    ->  XRight is X + 1,
+        get_cell_value(Puzzle,XRight,Y,Vright)
+    ;   Vright = -1
     ),
     % Regras
-    V \= Vup,
-    V \= Vdown,
-    V \= Vleft,
-    V \= Vright.
+    V \== Vup,
+    V \== Vdown,
+    V \== Vleft,
+    V \== Vright.
 
 % funcao teste para o tabuleiro inteiro
 
@@ -157,4 +157,4 @@ orthogonalDifference(Puzzle):-
 
 % Em construção
 solve(Puzzle) :-
-    orthogonal_difference(Puzzle, 1, 3).
+    orthogonal_difference(Puzzle, 1, 1).
