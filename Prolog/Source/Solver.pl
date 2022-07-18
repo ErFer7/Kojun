@@ -35,8 +35,8 @@ remove(Cell, [H|T], [H,R]) :-
     remove(Cell, T, R).
 
 % Pega lista de celulas na regiao R
-get_region_list(Puzzle,R,RegionCells):-
-    findall([V,R],(get_cell(Puzzle,X,Y,[V,R])),RegionCells).
+get_region_list(Puzzle, R, RegionCells):-
+    findall([V, R], (get_cell(Puzzle, _, _, [V, R])), RegionCells).
 
 % Regra de intervalo: valor deve estar entre 1 e N em regiao com N 
 interval(Puzzle, X, Y):-
@@ -51,17 +51,19 @@ vertical_greatness(Puzzle, X, Y) :-
     % Obtém o tamanho
     length(Puzzle, Size),
     % Obtém a célula na posição (x, y)
-    get_cell(Puzzle,X,Y,[V,R]),
+    get_cell(Puzzle,X,Y,[V, R]),
     % Obtém a célula acima
     (   Y > 0
         ->  Yup is Y - 1,  % Yup
-        get_cell_region(Puzzle,X,Yup,Rup)
+        get_cell_value(Puzzle, X, Yup, Vup),
+        get_cell_region(Puzzle, X, Yup, Rup)
     ;   Rup = -1
     ),
     % Obtém a célula abaixo
     (   Y < (Size - 1)
     ->  Ydown is Y + 1,
-        get_cell_region(Puzzle,X,Ydown,Rdown)
+        get_cell_value(Puzzle, X, Ydown, Vdown),
+        get_cell_region(Puzzle, X, Ydown, Rdown)
     ;   Rdown = -1
     ),
     % Regras de verificação
@@ -76,44 +78,38 @@ vertical_greatness(Puzzle, X, Y) :-
 
 % Regra de valor único na região.
 unique(Puzzle, X, Y) :-
-    % Obtém a célula na posição (x, y)
-    nth0(Y, Puzzle, Line),
-    nth0(X, Line, Cell),
+    get_cell(Puzzle, X, Y, Cell),
     % Planifica o puzzle
     flat(Puzzle, FlatPuzzle),
     remove(Cell, FlatPuzzle, CompPuzzle),
     maplist(dif(Cell), CompPuzzle).
 
-% Em construção
-solve(Puzzle) :-
-    unique(Puzzle, 0, 0).
-
 % verifica diferenca entre casas adjacentes
 orthogonal_difference(Puzzle,X,Y) :-
     length(Puzzle,Size),
     % Pega celula na posicao (X,Y)
-    get_cell_value(Puzzle,X,Y,V)
+    get_cell_value(Puzzle,X,Y,V),
     % Acima
     ( Y > 0
-    -> Yup = Y - 1,
+    -> Yup is Y - 1,
     get_cell_value(Puzzle,X,Yup,Vup)
     ; Vup = -1
     ),
     % Abaixo
     ( Y < (Size - 1)
-    -> Ydown = Y + 1,
+    -> Ydown is Y + 1,
     get_cell_value(Puzzle,X,Ydown,Vdown)
     ; Vdown = -1
     ),
     % Esquerda
     ( X > 0
-    -> XLeft = X - 1,
+    -> XLeft is X - 1,
     get_cell_value(Puzzle,XLeft,Y,Vleft)
     ; Vleft = -1
     ),
     % Direita
     ( X < (Size - 1),
-    XRight = X + 1,
+    XRight is X + 1,
     get_cell_value(Puzzle,XRight,Y,Vright)
     ; Vright = -1
     ),
@@ -158,3 +154,7 @@ orthogonalDifference(Puzzle):-
 
 % (i (am (starting((to miss) this) now))
 % msg: .asciiz "I prefer MIPS assembly over Prolog"
+
+% Em construção
+solve(Puzzle) :-
+    orthogonal_difference(Puzzle, 1, 3).
