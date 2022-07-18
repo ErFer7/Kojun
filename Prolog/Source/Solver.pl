@@ -118,6 +118,13 @@ orthogonal_difference(Puzzle,X,Y) :-
     V \== Vleft,
     V \== Vright.
 
+% Regras para que uma célula seja válida
+valid_cell(Puzzle, X, Y) :-
+    interval(Puzzle, X, Y),
+    unique(Puzzle, X, Y),
+    vertical_greatness(Puzzle, X, Y),
+    orthogonal_difference(Puzzle, X, Y).
+
 % Solução ---------------------------------------------------------------------
 % funcao teste para o tabuleiro inteiro
 orthogonal_loop_y(Puzzle,X,Y):-
@@ -139,7 +146,7 @@ orthogonal_loop_x(Puzzle,X,Y):-
     ).
 
 orthogonalDifference(Puzzle):- 
-    orthogonal_loop_y(Puzzle,0,0).
+    valid_cell(Puzzle,0,0).
 
 
 % % acha solucao com todas as condicoes acima validas
