@@ -6,9 +6,27 @@
 :- use_module(library(clpfd)).
 
 % Solução ---------------------------------------------------------------------
+% Planifica uma lista em apenas um nível
+flat([], []).
+flat([H|T], Out) :-
+    is_list(H),
+    flat(T, T1),
+    !,
+    append(H, T1, Out). 
+    flat(H, H).
 
+% Remove uma célula da lista
+remove(_, [], []).
+remove(Cell, [Cell|T], T).
+remove(Cell, [H|T], [H,R]) :-
+    remove(Cell, T, R).
+
+% Regra de intervalo
+% interval(Puzzle, X, Y).  % Não implementada.
+
+% Regra de gradeza vertical
 vertical_greatness(Puzzle, X, Y) :-
-    %
+    % Obtém o tamanho
     length(Puzzle, Size),
     % Obtém a célula na posição (x, y)
     nth0(Y, Puzzle, Line),
@@ -37,10 +55,19 @@ vertical_greatness(Puzzle, X, Y) :-
     ;   true
     ).
 
+% Regra de valor único na região.
+unique(Puzzle, X, Y) :-
+    % Obtém a célula na posição (x, y)
+    nth0(Y, Puzzle, Line),
+    nth0(X, Line, Cell),
+    % Planifica o puzzle
+    flat(Puzzle, FlatPuzzle),
+    remove(Cell, FlatPuzzle, CompPuzzle),
+    maplist(dif(Cell), CompPuzzle).
+
 % Em construção
 solve(Puzzle) :-
-    vertical_greatness(Puzzle, 5, 0),
-    true.
+    unique(Puzzle, 0, 0).
 
 % COMENTADO -------------------------------------------------------------------
 
@@ -139,19 +166,19 @@ orthogonal_difference(Puzzle,X,Y) :-
 orthogonal_loop_y(Puzzle,X,Y):-
     length(Puzzle,Size),
     orthogonal_loop_x(Puzzle,X,Y),
-    (Y < (Size - 1)
-    -> Y1 is Y + 1,
-    orthogonal_loop_y(Puzzle,X,Y1)
-    ; true
+    (   Y < (Size - 1)
+        -> Y1 is Y + 1,
+        orthogonal_loop_y(Puzzle,X,Y1)
+    ;   true
     ).
 
 orthogonal_loop_x(Puzzle,X,Y):-
     length(Puzzle,Size),
     orthogonal_difference(Puzzle,X,Y),
-    (X < (Size - 1)
-    -> X1 is X + 1,
-    orthogonal_loop_x(Puzzle,X1,Y),
-    ; true
+    (   X < (Size - 1)
+    ->  X1 is X + 1,
+        orthogonal_loop_x(Puzzle,X1,Y)
+    ;   true
     ).
 
 orthogonalDifference(Puzzle):- 
