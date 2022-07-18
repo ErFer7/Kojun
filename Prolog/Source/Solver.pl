@@ -34,9 +34,17 @@ remove(Cell, [Cell|T], T).
 remove(Cell, [H|T], [H,R]) :-
     remove(Cell, T, R).
 
-% Regra de intervalo: valor deve estar entre 1 e N em regiao com N 
-%interval(Puzzle, X, Y).
+% Pega lista de celulas na regiao R
+get_region_list(Puzzle,R,RegionCells):-
+    findall([V,R],(get_cell(Puzzle,X,Y,[V,R])),RegionCells).
 
+% Regra de intervalo: valor deve estar entre 1 e N em regiao com N 
+interval(Puzzle, X, Y):-
+    get_cell(Puzzle,X,Y,[V,R]),
+    get_region_list(Puzzle,R,RegionCells),
+    length(RegionCells,Size),
+    V > 0,
+    V =< Size.
 
 % Regra de gradeza vertical
 vertical_greatness(Puzzle, X, Y) :-
