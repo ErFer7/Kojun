@@ -127,8 +127,9 @@ valid_cell(Puzzle, X, Y) :-
 % Solução ---------------------------------------------------------------------
 % Resolve o puzzle
 solve(Puzzle, X, Y) :-
-    length(Puzzle, Size),
-    valid_cell(Puzzle, X1, Y1),
+    length(Puzzle, Size),        % Obtém o tamanho
+    valid_cell(Puzzle, X1, Y1),  % Define a relação de verificação
+    % Incrementação de coordenadas
     (   X == Size
     ->  X1 = 0,
         Y1 is Y + 1
