@@ -19,8 +19,28 @@ get_cell(Puzzle,X,Y,[V,R]):-
     nth0(X, Line, [V, R]).
 
 % verifica se dentre uma regiao, uma celula eh maior que a inferior
+% Planifica uma lista em apenas um nível
+flat([], []).
+flat([H|T], Out) :-
+    is_list(H),
+    flat(T, T1),
+    !,
+    append(H, T1, Out). 
+    flat(H, H).
+
+% Remove uma célula da lista
+remove(_, [], []).
+remove(Cell, [Cell|T], T).
+remove(Cell, [H|T], [H,R]) :-
+    remove(Cell, T, R).
+
+% Regra de intervalo: valor deve estar entre 1 e N em regiao com N 
+%interval(Puzzle, X, Y).
+
+
+% Regra de gradeza vertical
 vertical_greatness(Puzzle, X, Y) :-
-    %
+    % Obtém o tamanho
     length(Puzzle, Size),
     % Obtém a célula na posição (x, y)
     get_cell(Puzzle,X,Y,[V,R]),
@@ -46,38 +66,19 @@ vertical_greatness(Puzzle, X, Y) :-
     ;   true
     ).
 
+% Regra de valor único na região.
+unique(Puzzle, X, Y) :-
+    % Obtém a célula na posição (x, y)
+    nth0(Y, Puzzle, Line),
+    nth0(X, Line, Cell),
+    % Planifica o puzzle
+    flat(Puzzle, FlatPuzzle),
+    remove(Cell, FlatPuzzle, CompPuzzle),
+    maplist(dif(Cell), CompPuzzle).
+
 % Em construção
 solve(Puzzle) :-
-    vertical_greatness(Puzzle, 5, 0),
-    true.
-
-% COMENTADO -------------------------------------------------------------------
-
-% funcoes para evitar repeticoes [valor,regiao]
-
-% transforma matriz em lista unidimensional
-
-% oneDimentional([H],H):-!.
-% oneDimentional([H|T],Line_matrix):-
-%     line_matrix1 = oneDimentional(T,Line_matrix1),
-%     line_matrix = concatenate(H,Line_matrix1,Line_matrix).
-
-% % encontra duplicatas em lista
-% findDupes([H|T]):- member(H,T);
-%                    findDupes(T).
-
-% % verifica se cada elemento eh unico
-% allUnique(M):- Line_matrix = oneDimentional(M,Line_matrix),
-%                #\ findDupes(Line_matrix).
-
-
-% % funcoes para manter valores entre 1 e N
-
-
-below_N(Puzzle,X,Y):- 
-    get_cell(Puzzle,X,Y,[V,R]),
-    get_region(Puzzle,R). % continua...
-    
+    unique(Puzzle, 0, 0).
 
 % verifica diferenca entre casas adjacentes
 orthogonal_difference(Puzzle,X,Y) :-
@@ -121,19 +122,19 @@ orthogonal_difference(Puzzle,X,Y) :-
 orthogonal_loop_y(Puzzle,X,Y):-
     length(Puzzle,Size),
     orthogonal_loop_x(Puzzle,X,Y),
-    (Y < (Size - 1)
-    -> Y1 is Y + 1,
-    orthogonal_loop_y(Puzzle,X,Y1)
-    ; true
+    (   Y < (Size - 1)
+        -> Y1 is Y + 1,
+        orthogonal_loop_y(Puzzle,X,Y1)
+    ;   true
     ).
 
 orthogonal_loop_x(Puzzle,X,Y):-
     length(Puzzle,Size),
     orthogonal_difference(Puzzle,X,Y),
-    (X < (Size - 1)
-    -> X1 is X + 1,
-    orthogonal_loop_x(Puzzle,X1,Y),
-    ; true
+    (   X < (Size - 1)
+    ->  X1 is X + 1,
+        orthogonal_loop_x(Puzzle,X1,Y)
+    ;   true
     ).
 
 orthogonalDifference(Puzzle):- 
