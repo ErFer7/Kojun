@@ -3,6 +3,8 @@
 
 :- module(solver, [solve/3]).
 
+:- use_module(library(clpfd)).
+
 % Auxiliares ------------------------------------------------------------------
 % Obtenção de célula
 get_cell(Puzzle,X,Y,[V,R]):-
