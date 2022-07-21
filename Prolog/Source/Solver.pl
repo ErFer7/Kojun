@@ -42,8 +42,8 @@ interval(Puzzle, X, Y):-
     get_region_list(Puzzle,R,RegionCells),
     length(RegionCells,Size),
     % Regras
-    V > 0,
-    V =< Size.
+    V #> 0,
+    V #=< Size.
 
 % verifica se dentre uma região, uma célula é maior que a inferior
 vertical_greatness(Puzzle, X, Y) :-
@@ -52,26 +52,26 @@ vertical_greatness(Puzzle, X, Y) :-
     % Obtém a célula na posição (x, y)
     get_cell(Puzzle,X,Y,[V, R]),
     % Obtém a célula acima
-    (   Y > 0
-        ->  Yup is Y - 1,  % Yup
+    (   Y #> 0
+        ->  Yup #= Y - 1,  % Yup
         get_cell_value(Puzzle, X, Yup, Vup),
         get_cell_region(Puzzle, X, Yup, Rup)
-    ;   Rup = -1
+    ;   Rup #= -1
     ),
     % Obtém a célula abaixo
-    (   Y < (Size - 1)
-    ->  Ydown is Y + 1,
+    (   Y #< (Size - 1)
+    ->  Ydown #= Y + 1,
         get_cell_value(Puzzle, X, Ydown, Vdown),
         get_cell_region(Puzzle, X, Ydown, Rdown)
-    ;   Rdown = -1
+    ;   Rdown #= -1
     ),
     % Regras de verificação
-    (   R == Rup
-    ->  V < Vup
+    (   R #= Rup
+    ->  V #< Vup
     ;   true
     ),
-    (   R == Rdown
-    ->  V > Vdown
+    (   R #= Rdown
+    ->  V #> Vdown
     ;   true
     ).
 
@@ -88,34 +88,34 @@ orthogonal_difference(Puzzle,X,Y) :-
     % Pega celula na posicao (X,Y)
     get_cell_value(Puzzle, X, Y, V),
     % Acima
-    (   Y > 0
-    ->  Yup is Y - 1,
+    (   Y #> 0
+    ->  Yup #= Y - 1,
         get_cell_value(Puzzle, X, Yup, Vup)
-    ;   Vup = -1
+    ;   Vup #= -1
     ),
     % Abaixo
-    (   Y < (Size - 1)
-    ->  Ydown is Y + 1,
+    (   Y #< (Size - 1)
+    ->  Ydown #= Y + 1,
         get_cell_value(Puzzle, X, Ydown, Vdown)
-    ;   Vdown = -1
+    ;   Vdown #= -1
     ),
     % Esquerda
-    (   X > 0
-    ->  XLeft is X - 1,
+    (   X #> 0
+    ->  XLeft #= X - 1,
         get_cell_value(Puzzle, XLeft, Y, Vleft)
-    ;   Vleft = -1
+    ;   Vleft #= -1
     ),
     % Direita
-    (   X < (Size - 1)
-    ->  XRight is X + 1,
+    (   X #< (Size - 1)
+    ->  XRight #= X + 1,
         get_cell_value(Puzzle, XRight, Y, Vright)
-    ;   Vright = -1
+    ;   Vright #= -1
     ),
     % Regras
-    V \== Vup,
-    V \== Vdown,
-    V \== Vleft,
-    V \== Vright.
+    V #\= Vup,
+    V #\= Vdown,
+    V #\= Vleft,
+    V #\= Vright.
 
 % Regras para que uma célula seja válida
 valid_cell(Puzzle, X, Y) :-
@@ -130,11 +130,11 @@ solve(Puzzle, X, Y) :-
     length(Puzzle, Size),        % Obtém o tamanho
     valid_cell(Puzzle, X1, Y1),  % Define a relação de verificação
     % Incrementação de coordenadas
-    (   X == Size
-    ->  X1 = 0,
-        Y1 is Y + 1
-    ;   X1 is X + 1
+    (   X #= Size
+    ->  X1 #= 0,
+        Y1 #= Y + 1
+    ;   X1 #= X + 1
     ),
-    (   Y1 < Size
+    (   Y1 #< Size
     ->  solve(Puzzle, X1, Y1)
     ).
